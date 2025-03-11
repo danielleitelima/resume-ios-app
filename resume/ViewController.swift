@@ -66,7 +66,7 @@ struct Article: Codable {
 }
 
 class ViewController: UIViewController, UIScrollViewDelegate {
-    
+
     // MARK: - Properties
     let profilePhotoView = UIImageView()
     let nameLabel = UILabel()
@@ -856,19 +856,18 @@ class SectionButton: UIButton {
         super.init(frame: .zero)
         
         // Setup button appearance
-        self.backgroundColor = UIColor.systemGray6.withAlphaComponent(0.4)
         self.layer.cornerRadius = 20
         
         // Configure icon
         iconImageView.image = UIImage(systemName: icon)
-        iconImageView.tintColor = .white
+        iconImageView.tintColor = .label
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
         // Configure title
         customTitleLabel.text = title
         customTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        customTitleLabel.textColor = .white
+        customTitleLabel.textColor = .label
         customTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Add to hierarchy
@@ -889,6 +888,9 @@ class SectionButton: UIButton {
             customTitleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15),
             customTitleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor)
         ])
+        
+        // Initial appearance
+        updateAppearance()
     }
     
     required init?(coder: NSCoder) {
@@ -898,14 +900,26 @@ class SectionButton: UIButton {
     private func updateAppearance() {
         UIView.animate(withDuration: 0.2) {
             if self.isSelected {
-                self.backgroundColor = UIColor.white.withAlphaComponent(0.9)
-                self.iconImageView.tintColor = .black
-                self.customTitleLabel.textColor = .black
+                self.backgroundColor = .systemGray4
+                self.layer.borderWidth = 0
+                self.iconImageView.tintColor = .label
+                self.customTitleLabel.textColor = .label
             } else {
-                self.backgroundColor = UIColor.systemGray6.withAlphaComponent(0.4)
-                self.iconImageView.tintColor = .white
-                self.customTitleLabel.textColor = .white
+                self.backgroundColor = .clear
+                self.layer.borderWidth = 1
+                // Use systemGray instead of .label for border color to ensure visibility in dark mode
+                self.layer.borderColor = UIColor.systemGray.cgColor
+                self.iconImageView.tintColor = .label
+                self.customTitleLabel.textColor = .label
             }
+        }
+    }
+    
+    // Make sure appearance updates when trait collection changes (light/dark mode)
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateAppearance()
         }
     }
 }

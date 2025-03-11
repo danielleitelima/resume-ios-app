@@ -1,1 +1,6 @@
 /.DS_Store
+.build/
+*.resolved
+
+# treat .xcodeproj as a file
+!.xcodeproj
