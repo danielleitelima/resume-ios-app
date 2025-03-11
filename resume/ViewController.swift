@@ -106,7 +106,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     let experienceButton = SectionButton(title: "Experience", icon: "chart.line.uptrend.xyaxis")
     let languagesButton = SectionButton(title: "Languages", icon: "text.bubble.fill")
     let educationButton = SectionButton(title: "Education", icon: "book.fill")
-    let articlesButton = SectionButton(title: "Articles", icon: "doc.text.fill")
+    let articlesButton = SectionButton(title: "Articles", icon: "doc.fill")
     let contactButton = SectionButton(title: "Contact", icon: "questionmark.circle.fill")
     
     // Resume section views
@@ -115,8 +115,6 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     let experienceSection = ResumeSection(title: "Experience")
     let educationSection = ResumeSection(title: "Education")
     let languagesSection = ResumeSection(title: "Languages")
-    let codeSection = ResumeSection(title: "Code")
-    let articlesSection = ResumeSection(title: "Articles")
     let contactSection = ResumeSection(title: "Contact")
     
     // MARK: - Lifecycle Methods
@@ -290,39 +288,34 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         bottomRowStack.distribution = .fillEqually
         
         topRowStack.addArrangedSubview(introButton)
-        topRowStack.addArrangedSubview(codeButton)
         topRowStack.addArrangedSubview(skillsButton)
         
         middleRowStack.addArrangedSubview(experienceButton)
         middleRowStack.addArrangedSubview(languagesButton)
         
         bottomRowStack.addArrangedSubview(educationButton)
-        bottomRowStack.addArrangedSubview(articlesButton)
+        bottomRowStack.addArrangedSubview(contactButton)
         
         menuStackView.addArrangedSubview(topRowStack)
         menuStackView.addArrangedSubview(middleRowStack)
         menuStackView.addArrangedSubview(bottomRowStack)
-        menuStackView.addArrangedSubview(contactButton)
         
         // Setup close button
         let xImage = UIImage(systemName: "xmark")
         closeButton.setImage(xImage, for: .normal)
-        closeButton.tintColor = .white
+        closeButton.tintColor = .label
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         
         // Set up button actions
         introButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
-        codeButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         skillsButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         experienceButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         languagesButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         educationButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
-        articlesButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         contactButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         
         // Set constraints for background view
         NSLayoutConstraint.activate([
-
             menuBackgroundView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             menuBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             menuBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -331,7 +324,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             menuOverlay.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             menuOverlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             menuOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            menuOverlay.heightAnchor.constraint(equalToConstant: 350),
+            menuOverlay.heightAnchor.constraint(equalToConstant: 248),
             
             closeButton.topAnchor.constraint(equalTo: menuOverlay.topAnchor),
             closeButton.leadingAnchor.constraint(equalTo: menuOverlay.leadingAnchor, constant: 20),
@@ -540,12 +533,10 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         // Add new sections
         let allSections = [
             aboutMeSection, 
-            codeSection,
             skillsSection, 
             experienceSection, 
             languagesSection,
             educationSection, 
-            articlesSection,
             contactSection
         ]
         
@@ -564,17 +555,6 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             .map { "• \($0.description)" }
             .joined(separator: "\n")
         skillsSection.contentLabel.text = skillsText
-        
-        // Format code skills (for now using a subset of skills related to code)
-        let codeSkills = resume.skills
-            .filter { $0.description.contains("Kotlin") || $0.description.contains("Java") || 
-                     $0.description.contains("Android") || $0.description.contains("TypeScript") ||
-                     $0.description.contains("JavaScript") || $0.description.contains("HTML") ||
-                     $0.description.contains("CSS") || $0.description.contains("Git") }
-            .prefix(8)
-            .map { "• \($0.description)" }
-            .joined(separator: "\n")
-        codeSection.contentLabel.text = codeSkills.isEmpty ? "• Experienced developer" : codeSkills
         
         // Format experiences
         var experiencesText = ""
@@ -601,11 +581,6 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             .joined(separator: "\n\n")
         educationSection.contentLabel.text = educationText
         
-        // Format articles (if any)
-        articlesSection.contentLabel.text = resume.articles.isEmpty ? 
-            "No articles available at this time." : 
-            "Articles will be displayed here."
-        
         // Contact section
         contactSection.contentLabel.text = """
         Feel free to reach out for job opportunities or collaborations.
@@ -623,13 +598,8 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             aboutMeSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             aboutMeSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            // Code section
-            codeSection.topAnchor.constraint(equalTo: aboutMeSection.bottomAnchor, constant: 20),
-            codeSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            codeSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
             // Skills section
-            skillsSection.topAnchor.constraint(equalTo: codeSection.bottomAnchor, constant: 20),
+            skillsSection.topAnchor.constraint(equalTo: aboutMeSection.bottomAnchor, constant: 20),
             skillsSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             skillsSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
@@ -648,13 +618,8 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             educationSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             educationSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            // Articles section
-            articlesSection.topAnchor.constraint(equalTo: educationSection.bottomAnchor, constant: 20),
-            articlesSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            articlesSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
             // Contact section
-            contactSection.topAnchor.constraint(equalTo: articlesSection.bottomAnchor, constant: 20),
+            contactSection.topAnchor.constraint(equalTo: educationSection.bottomAnchor, constant: 20),
             contactSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             contactSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             contactSection.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
@@ -672,8 +637,8 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     
     @objc func sectionButtonTapped(_ sender: SectionButton) {
         // Reset all buttons
-        [introButton, codeButton, skillsButton, experienceButton, languagesButton, 
-         educationButton, articlesButton, contactButton].forEach { $0.isSelected = false }
+        [introButton, skillsButton, experienceButton, languagesButton, 
+         educationButton, contactButton].forEach { $0.isSelected = false }
         
         // Set selected button
         sender.isSelected = true
@@ -696,8 +661,6 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         var targetView: UIView?
         
         switch sender {
-        case codeButton:
-            targetView = codeSection
         case skillsButton:
             targetView = skillsSection
         case experienceButton:
@@ -706,8 +669,6 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             targetView = languagesSection
         case educationButton:
             targetView = educationSection
-        case articlesButton:
-            targetView = articlesSection
         case contactButton:
             targetView = contactSection
         default:
@@ -749,12 +710,10 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         // Define sections in order from top to bottom with their corresponding buttons
         let sections: [(view: UIView, button: SectionButton)] = [
             (profilePhotoView, introButton),
-            (codeSection, codeButton),
             (skillsSection, skillsButton),
             (experienceSection, experienceButton),
             (languagesSection, languagesButton),
             (educationSection, educationButton),
-            (articlesSection, articlesButton),
             (contactSection, contactButton)
         ]
         
