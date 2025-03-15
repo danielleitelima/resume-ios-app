@@ -7,64 +7,47 @@
 
 import UIKit
 
-class OutputSection: UIView {
-    let valueLabel = UILabel()
-    let durationLabel = UILabel()
-    let durationIcon: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "stopwatch"))
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-    
+class IntroductionSection: UIView {
+    let titleLabel = UILabel()
+    let descriptionLabel = UILabel()
+   
     @discardableResult
-    func setData(value: String, duration: String) -> OutputSection {
-        valueLabel.text = value
-        durationLabel.text = "calculated in \(duration)"
+    func setData(title: String, description: String) -> IntroductionSection {
+        titleLabel.text = title
+        descriptionLabel.text = description
         return self
     }
     
     init() {
         super.init(frame: .zero)
-        valueLabel.font = UIFont.systemFont(ofSize: 24, weight: .regular)
-        durationLabel.font = UIFont.systemFont(ofSize: 11, weight: .medium)
-        durationLabel.textColor = .secondaryLabel
-
-        durationIcon.tintColor = .secondaryLabel
+        titleLabel.font = UIFont.systemFont(ofSize: 24, weight: .regular)
+        titleLabel.numberOfLines = 0
+        descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        descriptionLabel.numberOfLines = 0
 
         setConstraints()
     }
     
     private func setConstraints() {
-        addSubview(valueLabel)
-        addSubview(durationLabel)
-        addSubview(durationIcon)
+        addSubview(titleLabel)
+        addSubview(descriptionLabel)
         
-        valueLabel.translatesAutoresizingMaskIntoConstraints = false
-        durationLabel.translatesAutoresizingMaskIntoConstraints = false
-        durationIcon.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            valueLabel.topAnchor.constraint(equalTo: topAnchor),
-            valueLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
-            valueLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
             
-            
-            durationIcon.topAnchor.constraint(equalTo: valueLabel.bottomAnchor, constant: 8),
-            durationIcon.leadingAnchor.constraint(equalTo: leadingAnchor),
-            durationIcon.bottomAnchor.constraint(equalTo: bottomAnchor),
-            
-            durationLabel.topAnchor.constraint(equalTo: durationIcon.topAnchor),
-            durationLabel.leadingAnchor.constraint(equalTo: durationIcon.trailingAnchor, constant: 4),
-            durationLabel.bottomAnchor.constraint(equalTo: durationIcon.bottomAnchor)
-         
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
-
-#Preview {
-    OutputSection().setData(value: "Test", duration: "3ms")
 }

@@ -1,96 +1,123 @@
 import UIKit
+import SafariServices
 
-class SkillSection: UIView {
-    private let titleLabel = UILabel()
-    private let carouselView = UIStackView()
+class FooterSection: UIView {
+    private let messageLabel = UILabel()
+    private let customDivider: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.secondaryLabel))
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
     
-    private var skills = [Skill]()
+    private let emailButton = FooterButton()
+    private let linkedInButton = FooterButton()
+    private let gitHubButton = FooterButton()
+    private let buttonsStackView = UIStackView()
+    
+    private var email: String?
+    private var linkedInURL: String?
+    private var gitHubURL: String?
     
     @discardableResult
     func setData(
-        skills: [Skill]
-    ) -> SkillSection {
-        self.skills = skills
+        email: String?,
+        linkedInURL: String?,
+        gitHubURL: String?
+    ) -> FooterSection {
+        self.email = email
+        self.linkedInURL = linkedInURL
+        self.gitHubURL = gitHubURL
         
-        setupContainer()
+        emailButton.setData(icon: "ic-mail")
+        linkedInButton.setData(icon: "ic-linkedin")
+        gitHubButton.setData(icon: "ic-github")
         
+        // Add targets for button actions
+        emailButton.addTarget(self, action: #selector(emailButtonTapped), for: .touchUpInside)
+        linkedInButton.addTarget(self, action: #selector(linkedInButtonTapped), for: .touchUpInside)
+        gitHubButton.addTarget(self, action: #selector(gitHubButtonTapped), for: .touchUpInside)
+
         return self
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
-      
-        titleLabel.textColor = .label
-        titleLabel.text = "Skills"
-       
         
-        titleLabel.numberOfLines = 0
+        messageLabel.text = "Let's talk!"
+        messageLabel.font = UIFont.systemFont(ofSize: 32, weight: .regular)
+        messageLabel.textColor = .secondaryLabel
+        messageLabel.numberOfLines = 2
+        messageLabel.textAlignment = .center
         
-        
+        setupButtonsStackView()
         setConstraints()
-        setupContainer()
     }
     
-    func setupContainer() {
-        // Remove any existing skill badges
-        carouselView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    private func setupButtonsStackView() {
+        buttonsStackView.axis = .horizontal
+        buttonsStackView.distribution = .equalSpacing
+        buttonsStackView.spacing = 24
+        buttonsStackView.alignment = .center
         
-        // Configure the container
-        carouselView.axis = .vertical
-        carouselView.alignment = .fill
-        carouselView.spacing = 12
-        carouselView.distribution = .fill
-        
-        // Create a horizontal flow layout container
-        let flowContainer = FlexboxLayout()
-        flowContainer.spacing = 8
-        flowContainer.padding = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        flowContainer.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Add each skill badge to the flow container
-        for skill in skills {
-            let badge = SkillBadge()
-            badge.setData(description: skill.description, imageURL: URL(string: skill.imageUrl))
-            flowContainer.addArrangedSubview(badge)
-        }
-        
-        // Add the flow container to the carousel
-        carouselView.addArrangedSubview(flowContainer)
-        
-        // Add the carousel to the view if it's not already added
-        if carouselView.superview == nil {
-            addSubview(carouselView)
-            carouselView.translatesAutoresizingMaskIntoConstraints = false
-            
-            NSLayoutConstraint.activate([
-                carouselView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
-                carouselView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-                carouselView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-                carouselView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor)
-            ])
-        }
-        
-        // Add width constraint to the flow container
-        if let superview = flowContainer.superview {
-            NSLayoutConstraint.activate([
-                flowContainer.widthAnchor.constraint(equalTo: superview.widthAnchor)
-            ])
-        }
+        buttonsStackView.addArrangedSubview(emailButton)
+        buttonsStackView.addArrangedSubview(linkedInButton)
+        buttonsStackView.addArrangedSubview(gitHubButton)
     }
-
     
     private func setConstraints() {
-        addSubview(titleLabel)
+        addSubview(customDivider)
+        addSubview(messageLabel)
+        addSubview(buttonsStackView)
         
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        customDivider.translatesAutoresizingMaskIntoConstraints = false
+        messageLabel.translatesAutoresizingMaskIntoConstraints = false
+        buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
       
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            customDivider.topAnchor.constraint(equalTo: topAnchor),
+            customDivider.leadingAnchor.constraint(equalTo: leadingAnchor),
+            customDivider.trailingAnchor.constraint(equalTo: trailingAnchor),
+            
+            messageLabel.topAnchor.constraint(equalTo: customDivider.bottomAnchor, constant: 16),
+            messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
+            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
+            
+            buttonsStackView.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 24),
+            buttonsStackView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            buttonsStackView.heightAnchor.constraint(greaterThanOrEqualToConstant: 48),
+            buttonsStackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32)
         ])
+        
+        // Set a fixed width for each button to ensure they're visible
+        [emailButton, linkedInButton, gitHubButton].forEach { button in
+            button.widthAnchor.constraint(equalToConstant: 48).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        }
+    }
+    
+    // MARK: - Button Actions
+    
+    @objc private func emailButtonTapped() {
+        guard let email = email, let emailURL = URL(string: "mailto:\(email)") else { return }
+        
+        if UIApplication.shared.canOpenURL(emailURL) {
+            UIApplication.shared.open(emailURL, options: [:], completionHandler: nil)
+        }
+    }
+    
+    @objc private func linkedInButtonTapped() {
+        guard let linkedInURLString = linkedInURL, let url = URL(string: linkedInURLString) else { return }
+        presentSafariViewController(with: url)
+    }
+    
+    @objc private func gitHubButtonTapped() {
+        guard let gitHubURLString = gitHubURL, let url = URL(string: gitHubURLString) else { return }
+        presentSafariViewController(with: url)
+    }
+    
+    private func presentSafariViewController(with url: URL) {
+        let safariVC = SFSafariViewController(url: url)
+        UIApplication.shared.windows.first?.rootViewController?.present(safariVC, animated: true)
     }
     
     required init?(coder: NSCoder) {

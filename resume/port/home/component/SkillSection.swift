@@ -1,24 +1,18 @@
 import UIKit
 
-class SampleSection: UIView {
+class SkillSection: UIView {
     private let titleLabel = UILabel()
     private let carouselView = UIStackView()
     
-    let samplesScrollView = UIScrollView()
-    let samplesStackView = UIStackView()
-    
-    private var samples = [CodeSample]()
-    private var onSelect: (CodeSample) -> Void = { _ in }
+    private var skills = [Skill]()
     
     @discardableResult
     func setData(
-        samples: [CodeSample],
-        onSelect: @escaping (CodeSample) -> Void
-    ) -> SampleSection {
-        self.samples = samples
-        self.onSelect = onSelect
+        skills: [Skill]
+    ) -> SkillSection {
+        self.skills = skills
         
-        setupCarousel()
+        setupContainer()
         
         return self
     }
@@ -29,7 +23,7 @@ class SampleSection: UIView {
         titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
       
         titleLabel.textColor = .label
-        titleLabel.text = "Code samples"
+        titleLabel.text = "Skills"
        
         
         titleLabel.numberOfLines = 0
@@ -37,104 +31,55 @@ class SampleSection: UIView {
         
         setConstraints()
         setupContainer()
-       
-        
     }
     
-    func setupCarousel() {
-        samplesStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    func setupContainer() {
+        // Remove any existing skill badges
+        carouselView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        for subview in samplesScrollView.subviews {
-            if let label = subview as? UILabel {
-                label.removeFromSuperview()
-            }
+        // Configure the container
+        carouselView.axis = .vertical
+        carouselView.alignment = .fill
+        carouselView.spacing = 12
+        carouselView.distribution = .fill
+        
+        // Create a horizontal flow layout container
+        let flowContainer = FlexboxLayout()
+        flowContainer.spacing = 8
+        flowContainer.padding = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        flowContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add each skill badge to the flow container
+        for skill in skills {
+            let badge = SkillBadge()
+            badge.setData(description: skill.description, imageURL: URL(string: skill.imageUrl))
+            flowContainer.addArrangedSubview(badge)
         }
         
-        if samples.isEmpty {
-            let emptyLabel = UILabel()
-            emptyLabel.text = "No code samples available"
-            emptyLabel.textColor = .secondaryLabel
-            emptyLabel.textAlignment = .center
-            emptyLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-            emptyLabel.translatesAutoresizingMaskIntoConstraints = false
-            
-            samplesScrollView.addSubview(emptyLabel)
-            
-            NSLayoutConstraint.activate([
-                emptyLabel.centerXAnchor.constraint(equalTo: samplesScrollView.centerXAnchor),
-                emptyLabel.centerYAnchor.constraint(equalTo: samplesScrollView.centerYAnchor)
-            ])
-            return
-        }
+        // Add the flow container to the carousel
+        carouselView.addArrangedSubview(flowContainer)
         
-        for sample in samples {
-            
-            let card = SampleCard()
-                .setData(
-                    title: sample.Name,
-                    description: sample.Description,
-                    imageURL: URL(string: sample.ThumbnailURL)
-                )
-            
-            card.onClick = { [weak self] in
-                guard let self = self else { return }
-                self.onSelect(sample)
-            }
-            
-            samplesStackView.addArrangedSubview(card)
+        // Add the carousel to the view if it's not already added
+        if carouselView.superview == nil {
+            addSubview(carouselView)
+            carouselView.translatesAutoresizingMaskIntoConstraints = false
             
             NSLayoutConstraint.activate([
-                card.widthAnchor.constraint(equalToConstant: 164)
+                carouselView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+                carouselView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+                carouselView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+                carouselView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor)
             ])
         }
         
-        samplesScrollView.contentSize = CGSize(
-            width: CGFloat(samples.count) * (164 + 12) + 24, // card width + spacing + padding
-            height: samplesScrollView.frame.height
-        )
+        // Add width constraint to the flow container
+        if let superview = flowContainer.superview {
+            NSLayoutConstraint.activate([
+                flowContainer.widthAnchor.constraint(equalTo: superview.widthAnchor)
+            ])
+        }
     }
-    
-    private func setupContainer(){
-        addSubview(samplesScrollView)
-        
-        samplesScrollView.translatesAutoresizingMaskIntoConstraints = false
-        samplesScrollView.showsHorizontalScrollIndicator = false
-        samplesScrollView.showsVerticalScrollIndicator = false
-        samplesScrollView.addSubview(samplesStackView)
-        
-        samplesStackView.translatesAutoresizingMaskIntoConstraints = false
-        samplesStackView.axis = .horizontal
-        samplesStackView.spacing = 12
-        samplesStackView.alignment = .center
-            
-        // Set constraints
-        NSLayoutConstraint.activate([
-            samplesScrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 32),
-            samplesScrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            samplesScrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            samplesScrollView.heightAnchor.constraint(equalToConstant: 240),
-            samplesScrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            
-            samplesStackView.topAnchor.constraint(equalTo: samplesScrollView.topAnchor),
-            samplesStackView.leadingAnchor.constraint(equalTo: samplesScrollView.leadingAnchor, constant: 12),
-            samplesStackView.trailingAnchor.constraint(equalTo: samplesScrollView.trailingAnchor, constant: -12),
-            samplesStackView.heightAnchor.constraint(equalTo: samplesScrollView.heightAnchor)
-        ])
-        
-        let placeholderLabel = UILabel()
-        placeholderLabel.text = "Loading code samples..."
-        placeholderLabel.textColor = .secondaryLabel
-        placeholderLabel.textAlignment = .center
-        placeholderLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
-            
-        samplesScrollView.addSubview(placeholderLabel)
-            
-        NSLayoutConstraint.activate([
-            placeholderLabel.centerXAnchor.constraint(equalTo: samplesScrollView.centerXAnchor),
-            placeholderLabel.centerYAnchor.constraint(equalTo: samplesScrollView.centerYAnchor)
-        ])
-    }
+
     
     private func setConstraints() {
         addSubview(titleLabel)

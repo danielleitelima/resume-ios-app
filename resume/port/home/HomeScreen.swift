@@ -4,11 +4,22 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
 
     // MARK: - Properties
     let profilePhotoView = UIImageView()
-    let nameLabel = UILabel()
-    let jobTitleLabel = UILabel()
-    let contactInfoView = ContactInfoView()
+   
     let scrollView = UIScrollView()
     let contentView = UIView()
+    
+    private let personalDataSection = PersonalDataSection()
+    private let sampleSection = SampleSection()
+    private let skillSection = SkillSection()
+    private let languageSection = LanguageSection()
+    private let footerSection = FooterSection()
+    private let experienceSection = ExperienceSection()
+    
+    private let customDivider: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.systemCyan))
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
     
     // Status bar background view
     let statusBarView = UIView()
@@ -42,18 +53,8 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
     let skillsButton = SectionButton().setData(title: "Skills", icon: "wrench.fill")
     let experienceButton = SectionButton().setData(title: "Experience", icon: "chart.line.uptrend.xyaxis")
     let languagesButton = SectionButton().setData(title: "Languages", icon: "text.bubble.fill")
-    let educationButton = SectionButton().setData(title: "Education", icon: "book.fill")
     let articlesButton = SectionButton().setData(title: "Articles", icon: "doc.fill")
     let contactButton = SectionButton().setData(title: "Contact", icon: "questionmark.circle.fill")
-    
-    // Resume section views
-    let aboutMeSection = ResumeSection().setData(title: "About Me")
-    let codeSamplesSection = ResumeSection().setData(title: "Code Samples")
-    let skillsSection = ResumeSection().setData(title: "Skills")
-    let experienceSection = ResumeSection().setData(title: "Experience")
-    let educationSection = ResumeSection().setData(title: "Education")
-    let languagesSection = ResumeSection().setData(title: "Languages")
-    let contactSection = ResumeSection().setData(title: "Contact")
     
     // Code samples carousel
     let codeSamplesCarouselView = UIScrollView()
@@ -236,7 +237,6 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         middleRowStack.addArrangedSubview(experienceButton)
         
         bottomRowStack.addArrangedSubview(languagesButton)
-        bottomRowStack.addArrangedSubview(educationButton)
         
         menuStackView.addArrangedSubview(topRowStack)
         menuStackView.addArrangedSubview(middleRowStack)
@@ -254,7 +254,6 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         skillsButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         experienceButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         languagesButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
-        educationButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         contactButton.addTarget(self, action: #selector(sectionButtonTapped(_:)), for: .touchUpInside)
         
         // Set constraints for background view
@@ -361,12 +360,24 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
                 self.codeSamples = samples
                 
                 DispatchQueue.main.async {
-                    self.setupCodeSamplesCarousel()
+                    self.sampleSection.setData(
+                        samples: self.codeSamples
+                    ){
+                        sample in
+                        self.showCodeSampleDetail(sample)
+                    }
                 }
             } catch {
                 print("Failed to parse code samples: \(error)")
             }
         }.resume()
+    }
+    
+    // Navigate to code sample detail screen
+    func showCodeSampleDetail(_ sample: CodeSample) {
+        let sampleDetailScreen = SampleDetailScreen(sample: sample)
+        let navController = UINavigationController(rootViewController: sampleDetailScreen)
+        present(navController, animated: true)
     }
     
     func hideLoadingView() {
@@ -418,13 +429,22 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
     // MARK: - UI Setup with Resume Data
     func setupUI(with resume: Resume) {
         setupProfileImageView(with: resume.personalData)
-        setupNameAndTitle(with: resume.personalData)
-        setupContactInfo(with: resume.personalData)
-        setupResumeSections(with: resume)
+        
+        setupPersonalDataSection(with: resume)
+        
+        setupSampleSection()
+
+        setupSkillsSection(with: resume.skills)
+        
+        setupExperienceSection(with: resume.experiences)
+        
+        setupLanguageSection(with: resume.languages)
+        
+        setupFooterSection(with: resume.personalData)
     }
     
     func setupProfileImageView(with personalData: PersonalData) {
-        let size: CGFloat = 150
+        let size: CGFloat = 200
 
         contentView.addSubview(profilePhotoView)
         
@@ -450,6 +470,123 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         ])
     }
     
+    func setupPersonalDataSection(with resume: Resume) {
+        contentView.addSubview(personalDataSection)
+        contentView.addSubview(customDivider)
+        
+        personalDataSection.translatesAutoresizingMaskIntoConstraints = false
+        customDivider.translatesAutoresizingMaskIntoConstraints = false
+
+        personalDataSection.setData(
+            name: resume.personalData.name,
+            shortDescription: resume.personalData.description,
+            location: resume.personalData.location,
+            title: resume.introduction.title,
+            description: resume.introduction.description
+        )
+        
+        NSLayoutConstraint.activate([
+            personalDataSection.topAnchor.constraint(
+                equalTo: profilePhotoView.bottomAnchor,
+                constant: 24
+            ),
+            personalDataSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            personalDataSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            
+            customDivider.topAnchor.constraint(equalTo: personalDataSection.bottomAnchor, constant: 32),
+            customDivider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 48),
+            customDivider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -48),
+            
+        ])
+    }
+    
+    func setupSampleSection() {
+        contentView.addSubview(sampleSection)
+        
+        sampleSection.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            sampleSection.topAnchor.constraint(
+                equalTo: customDivider.bottomAnchor,
+                constant: 24
+            ),
+            sampleSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            sampleSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+        ])
+    }
+    
+    func setupSkillsSection(with skills: [Skill]) {
+        skillSection.setData(skills: skills)
+        
+        contentView.addSubview(skillSection)
+        
+        skillSection.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            skillSection.topAnchor.constraint(
+                equalTo: sampleSection.bottomAnchor,
+                constant: 24
+            ),
+            skillSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            skillSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+        ])
+    }
+    
+    func setupExperienceSection(with experiences: [Experience]) {
+        experienceSection.setData(experiences)
+        
+        contentView.addSubview(experienceSection)
+        
+        experienceSection.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            experienceSection.topAnchor.constraint(
+                equalTo: skillSection.bottomAnchor,
+                constant: 24
+            ),
+            experienceSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            experienceSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+        ])
+    }
+    
+    func setupLanguageSection(with languages: [Language]) {
+        languageSection.setData(languages: languages)
+        
+        contentView.addSubview(languageSection)
+        
+        languageSection.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            languageSection.topAnchor.constraint(
+                equalTo: experienceSection.bottomAnchor,
+                constant: 24
+            ),
+            languageSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            languageSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+        ])
+    }
+    
+    func setupFooterSection(with personalData: PersonalData) {
+        footerSection.setData(email: personalData.emailAddress, linkedInURL: personalData.linkedinUrl, gitHubURL: personalData.githubUrl)
+        
+        contentView.addSubview(footerSection)
+        
+        footerSection.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            footerSection.topAnchor.constraint(
+                equalTo: languageSection.bottomAnchor,
+                constant: 48
+            ),
+            footerSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            footerSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            footerSection.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+        ])
+    }
+    
     func downloadImage(from url: URL, for imageView: UIImageView) {
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
@@ -463,275 +600,6 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         }.resume()
     }
     
-    func setupNameAndTitle(with personalData: PersonalData) {
-        contentView.addSubview(nameLabel)
-        contentView.addSubview(jobTitleLabel)
-        
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        jobTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        nameLabel.text = personalData.name
-        nameLabel.font = UIFont.systemFont(ofSize: 28, weight: .bold)
-        nameLabel.textAlignment = .center
-        
-        // Convert \n in description to spaces for job title
-        let jobTitle = personalData.description.replacingOccurrences(of: "\\n", with: " ")
-        jobTitleLabel.text = jobTitle
-        jobTitleLabel.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-        jobTitleLabel.textColor = .secondaryLabel
-        jobTitleLabel.textAlignment = .center
-        jobTitleLabel.numberOfLines = 0
-        
-        NSLayoutConstraint.activate([
-            nameLabel.topAnchor.constraint(equalTo: profilePhotoView.bottomAnchor, constant: 20),
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            jobTitleLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
-            jobTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            jobTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
-        ])
-    }
-    
-    func setupContactInfo(with personalData: PersonalData) {
-        contentView.addSubview(contactInfoView)
-        contactInfoView.translatesAutoresizingMaskIntoConstraints = false
-        
-        contactInfoView.setData(
-            email: personalData.emailAddress,
-            location: personalData.location,
-            linkedin: personalData.linkedinUrl,
-            github: personalData.githubUrl
-        )
-        
-        NSLayoutConstraint.activate([
-            contactInfoView.topAnchor.constraint(equalTo: jobTitleLabel.bottomAnchor, constant: 24),
-            contactInfoView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            contactInfoView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
-        ])
-    }
-    
-    func setupResumeSections(with resume: Resume) {
-        // Add new sections
-        let allSections = [
-            aboutMeSection, 
-            codeSamplesSection,
-            skillsSection, 
-            experienceSection, 
-            languagesSection,
-            educationSection, 
-            contactSection
-        ]
-        
-        // Add all sections to content view
-        allSections.forEach { section in
-            contentView.addSubview(section)
-            section.translatesAutoresizingMaskIntoConstraints = false
-        }
-        
-        // Set content for sections
-        aboutMeSection.contentLabel.text = resume.introduction.description
-        
-        // Setup code samples carousel container
-        setupCodeSamplesContainer()
-        
-        // Format skills
-        let skillsText = resume.skills
-            .prefix(10) // Limit to first 10 skills to avoid overwhelming
-            .map { "• \($0.description)" }
-            .joined(separator: "\n")
-        skillsSection.contentLabel.text = skillsText
-        
-        // Format experiences
-        var experiencesText = ""
-        for experience in resume.experiences {
-            experiencesText += "\(experience.company.name) - \(experience.company.location)\n"
-            experiencesText += "\(experience.company.period)\n"
-            
-            for role in experience.roles {
-                experiencesText += "• \(role.name) (\(role.period))\n"
-                experiencesText += "• \(role.description)\n\n"
-            }
-        }
-        experienceSection.contentLabel.text = experiencesText
-        
-        // Format languages
-        let languagesText = resume.languages
-            .map { "• \($0.name) (\($0.description))" }
-            .joined(separator: "\n")
-        languagesSection.contentLabel.text = languagesText
-        
-        // Format education
-        let educationText = resume.education
-            .map { "• \($0.title)\n  \($0.institution)\n  \($0.period)\n  \($0.location)" }
-            .joined(separator: "\n\n")
-        educationSection.contentLabel.text = educationText
-        
-        // Contact section
-        contactSection.contentLabel.text = """
-        Feel free to reach out for job opportunities or collaborations.
-
-        Email: \(resume.personalData.emailAddress)
-        Location: \(resume.personalData.location)
-        LinkedIn: \(resume.personalData.linkedinUrl)
-        GitHub: \(resume.personalData.githubUrl)
-        """
-        
-        // Set up constraints
-        NSLayoutConstraint.activate([
-            // About Me section
-            aboutMeSection.topAnchor.constraint(equalTo: contactInfoView.bottomAnchor, constant: 24),
-            aboutMeSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            aboutMeSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Code Samples section
-            codeSamplesSection.topAnchor.constraint(equalTo: aboutMeSection.bottomAnchor, constant: 20),
-            codeSamplesSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            codeSamplesSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            
-            // Skills section
-            skillsSection.topAnchor.constraint(equalTo: codeSamplesSection.bottomAnchor, constant: 20),
-            skillsSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            skillsSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Experience section
-            experienceSection.topAnchor.constraint(equalTo: skillsSection.bottomAnchor, constant: 20),
-            experienceSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            experienceSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Languages section
-            languagesSection.topAnchor.constraint(equalTo: experienceSection.bottomAnchor, constant: 20),
-            languagesSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            languagesSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Education section
-            educationSection.topAnchor.constraint(equalTo: languagesSection.bottomAnchor, constant: 20),
-            educationSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            educationSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            // Contact section
-            contactSection.topAnchor.constraint(equalTo: educationSection.bottomAnchor, constant: 20),
-            contactSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            contactSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            contactSection.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
-        ])
-    }
-    
-    // Setup container for code samples carousel
-    func setupCodeSamplesContainer() {
-        // Remove content label from code samples section
-        codeSamplesSection.contentLabel.removeFromSuperview()
-        
-        // Add carousel scroll view to code samples section
-        codeSamplesSection.addSubview(codeSamplesCarouselView)
-        codeSamplesCarouselView.translatesAutoresizingMaskIntoConstraints = false
-        codeSamplesCarouselView.showsHorizontalScrollIndicator = false
-        codeSamplesCarouselView.showsVerticalScrollIndicator = false
-        
-        // Add stack view to carousel
-        codeSamplesCarouselView.addSubview(codeSamplesStackView)
-        codeSamplesStackView.translatesAutoresizingMaskIntoConstraints = false
-        codeSamplesStackView.axis = .horizontal
-        codeSamplesStackView.spacing = 15
-        codeSamplesStackView.alignment = .center
-        
-        // Set constraints
-        NSLayoutConstraint.activate([
-            codeSamplesCarouselView.topAnchor.constraint(equalTo: codeSamplesSection.dividerLine.bottomAnchor, constant: 12),
-            codeSamplesCarouselView.leadingAnchor.constraint(equalTo: codeSamplesSection.leadingAnchor),
-            codeSamplesCarouselView.trailingAnchor.constraint(equalTo: codeSamplesSection.trailingAnchor),
-            codeSamplesCarouselView.heightAnchor.constraint(equalToConstant: 240),
-            codeSamplesCarouselView.bottomAnchor.constraint(equalTo: codeSamplesSection.bottomAnchor),
-            
-            codeSamplesStackView.topAnchor.constraint(equalTo: codeSamplesCarouselView.topAnchor),
-            codeSamplesStackView.leadingAnchor.constraint(equalTo: codeSamplesCarouselView.leadingAnchor, constant: 10),
-            codeSamplesStackView.trailingAnchor.constraint(equalTo: codeSamplesCarouselView.trailingAnchor, constant: -10),
-            codeSamplesStackView.heightAnchor.constraint(equalTo: codeSamplesCarouselView.heightAnchor)
-        ])
-        
-        // Add a placeholder message if no code samples are available yet
-        let placeholderLabel = UILabel()
-        placeholderLabel.text = "Loading code samples..."
-        placeholderLabel.textColor = .secondaryLabel
-        placeholderLabel.textAlignment = .center
-        placeholderLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        codeSamplesCarouselView.addSubview(placeholderLabel)
-        
-        NSLayoutConstraint.activate([
-            placeholderLabel.centerXAnchor.constraint(equalTo: codeSamplesCarouselView.centerXAnchor),
-            placeholderLabel.centerYAnchor.constraint(equalTo: codeSamplesCarouselView.centerYAnchor)
-        ])
-    }
-    
-    // Setup code samples carousel with data from API
-    func setupCodeSamplesCarousel() {
-        // Remove all existing cards
-        codeSamplesStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
-        // Remove placeholder label if it exists
-        for subview in codeSamplesCarouselView.subviews {
-            if let label = subview as? UILabel {
-                label.removeFromSuperview()
-            }
-        }
-        
-        if codeSamples.isEmpty {
-            // Show "No code samples available" message
-            let emptyLabel = UILabel()
-            emptyLabel.text = "No code samples available"
-            emptyLabel.textColor = .secondaryLabel
-            emptyLabel.textAlignment = .center
-            emptyLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-            emptyLabel.translatesAutoresizingMaskIntoConstraints = false
-            
-            codeSamplesCarouselView.addSubview(emptyLabel)
-            
-            NSLayoutConstraint.activate([
-                emptyLabel.centerXAnchor.constraint(equalTo: codeSamplesCarouselView.centerXAnchor),
-                emptyLabel.centerYAnchor.constraint(equalTo: codeSamplesCarouselView.centerYAnchor)
-            ])
-            return
-        }
-        
-        // Add code sample cards
-        for sample in codeSamples {
-            
-            let card = CodeSampleCard()
-                .setData(
-                    title: sample.Name,
-                    description: sample.Description,
-                    imageURL: URL(string: sample.ThumbnailURL)
-                )
-            
-            card.onClick = { [weak self] in
-                guard let self = self else { return }
-                self.showCodeSampleDetail(sample)
-            }
-            
-            codeSamplesStackView.addArrangedSubview(card)
-            
-            // Set fixed width for each card
-            NSLayoutConstraint.activate([
-                card.widthAnchor.constraint(equalToConstant: 164)
-            ])
-        }
-        
-        // Update content size for horizontal scrolling
-        codeSamplesCarouselView.contentSize = CGSize(
-            width: CGFloat(codeSamples.count) * (164 + 15) + 20, // card width + spacing + padding
-            height: codeSamplesCarouselView.frame.height
-        )
-    }
-    
-    // Navigate to code sample detail screen
-    func showCodeSampleDetail(_ sample: CodeSample) {
-        let detailVC = CodeSampleDetailViewController(sample: sample)
-        let navController = UINavigationController(rootViewController: detailVC)
-        present(navController, animated: true)
-    }
-    
     // MARK: - Actions
     @objc func menuButtonTapped() {
         toggleMenu(open: true)
@@ -743,8 +611,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
     
     @objc func sectionButtonTapped(_ sender: SectionButton) {
         // Reset all buttons
-        [introButton, codeButton, skillsButton, experienceButton, languagesButton, 
-         educationButton, contactButton].forEach { $0.isSelected = false }
+        [introButton, codeButton, skillsButton, experienceButton, languagesButton, contactButton].forEach { $0.isSelected = false }
         
         // Set selected button
         sender.isSelected = true
@@ -768,17 +635,15 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         
         switch sender {
         case codeButton:
-            targetView = codeSamplesSection
+            targetView = sampleSection
         case skillsButton:
-            targetView = skillsSection
+            targetView = skillSection
         case experienceButton:
             targetView = experienceSection
         case languagesButton:
-            targetView = languagesSection
-        case educationButton:
-            targetView = educationSection
+            targetView = languageSection
         case contactButton:
-            targetView = contactSection
+            targetView = footerSection
         default:
             break
         }
@@ -818,12 +683,11 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         // Define sections in order from top to bottom with their corresponding buttons
         let sections: [(view: UIView, button: SectionButton)] = [
             (profilePhotoView, introButton),
-            (codeSamplesSection, codeButton),
-            (skillsSection, skillsButton),
+            (sampleSection, codeButton),
+            (skillSection, skillsButton),
             (experienceSection, experienceButton),
-            (languagesSection, languagesButton),
-            (educationSection, educationButton),
-            (contactSection, contactButton)
+            (languageSection, languagesButton),
+            (footerSection, contactButton)
         ]
         
         // Reset all buttons

@@ -1,108 +1,150 @@
 import UIKit
 
-class PersonalDataSection: UIView {
-    private let nameLabel = UILabel()
-    private let shortDescriptionLabel = UILabel()
-    let locationIcon: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "location.fill"))
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-    
-    private let locationLabel = UILabel()
+class SampleSection: UIView {
     private let titleLabel = UILabel()
-    private let descriptionLabel = UILabel()
+    private let carouselView = UIStackView()
+    
+    let samplesScrollView = UIScrollView()
+    let samplesStackView = UIStackView()
+    
+    private var samples = [CodeSample]()
+    private var onSelect: (CodeSample) -> Void = { _ in }
     
     @discardableResult
     func setData(
-        name: String,
-        shortDescription: String,
-        location: String,
-        title: String,
-        description: String
-    ) -> PersonalDataSection {
-       
-        nameLabel.text = name
-        shortDescriptionLabel.text = shortDescription
-        locationLabel.text = location
-        titleLabel.text = title
-        descriptionLabel.text = description
+        samples: [CodeSample],
+        onSelect: @escaping (CodeSample) -> Void
+    ) -> SampleSection {
+        self.samples = samples
+        self.onSelect = onSelect
+        
+        setupCarousel()
         
         return self
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        backgroundColor = .systemGray6
-        layer.cornerRadius = 12
-        
-        nameLabel.font = .systemFont(ofSize: 36, weight: .regular)
-        shortDescriptionLabel.font = .systemFont(ofSize: 16, weight: .regular)
-        locationLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        titleLabel.font = .systemFont(ofSize: 24, weight: .regular)
-        descriptionLabel.font = .systemFont(ofSize: 14, weight: .regular)
-        
-        nameLabel.textColor = .label
-        shortDescriptionLabel.textColor = .label
-        locationIcon.tintColor = .label
-        locationLabel.textColor = .label
-        titleLabel.textColor = .label
-        descriptionLabel.textColor = .label
-        
-        nameLabel.numberOfLines = 0
-        shortDescriptionLabel.numberOfLines = 0
-        locationLabel.numberOfLines = 0
-        titleLabel.numberOfLines = 0
-        descriptionLabel.numberOfLines = 0
 
+        titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
+      
+        titleLabel.textColor = .label
+        titleLabel.text = "Code samples"
+       
+        
+        titleLabel.numberOfLines = 0
+        
+        
         setConstraints()
+        setupContainer()
+       
+        
+    }
+    
+    func setupCarousel() {
+        samplesStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        for subview in samplesScrollView.subviews {
+            if let label = subview as? UILabel {
+                label.removeFromSuperview()
+            }
+        }
+        
+        if samples.isEmpty {
+            let emptyLabel = UILabel()
+            emptyLabel.text = "No code samples available"
+            emptyLabel.textColor = .secondaryLabel
+            emptyLabel.textAlignment = .center
+            emptyLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+            emptyLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            samplesScrollView.addSubview(emptyLabel)
+            
+            NSLayoutConstraint.activate([
+                emptyLabel.centerXAnchor.constraint(equalTo: samplesScrollView.centerXAnchor),
+                emptyLabel.centerYAnchor.constraint(equalTo: samplesScrollView.centerYAnchor)
+            ])
+            return
+        }
+        
+        for sample in samples {
+            
+            let card = SampleCard()
+                .setData(
+                    title: sample.Name,
+                    description: sample.Description,
+                    imageURL: URL(string: sample.ThumbnailURL)
+                )
+            
+            card.onClick = { [weak self] in
+                guard let self = self else { return }
+                self.onSelect(sample)
+            }
+            
+            samplesStackView.addArrangedSubview(card)
+            
+            NSLayoutConstraint.activate([
+                card.widthAnchor.constraint(equalToConstant: 164)
+            ])
+        }
+        
+        samplesScrollView.contentSize = CGSize(
+            width: CGFloat(samples.count) * (164 + 12) + 24, // card width + spacing + padding
+            height: samplesScrollView.frame.height
+        )
+    }
+    
+    private func setupContainer(){
+        addSubview(samplesScrollView)
+        
+        samplesScrollView.translatesAutoresizingMaskIntoConstraints = false
+        samplesScrollView.showsHorizontalScrollIndicator = false
+        samplesScrollView.showsVerticalScrollIndicator = false
+        samplesScrollView.addSubview(samplesStackView)
+        
+        samplesStackView.translatesAutoresizingMaskIntoConstraints = false
+        samplesStackView.axis = .horizontal
+        samplesStackView.spacing = 12
+        samplesStackView.alignment = .center
+            
+        // Set constraints
+        NSLayoutConstraint.activate([
+            samplesScrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 32),
+            samplesScrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            samplesScrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            samplesScrollView.heightAnchor.constraint(equalToConstant: 240),
+            samplesScrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            
+            samplesStackView.topAnchor.constraint(equalTo: samplesScrollView.topAnchor),
+            samplesStackView.leadingAnchor.constraint(equalTo: samplesScrollView.leadingAnchor, constant: 12),
+            samplesStackView.trailingAnchor.constraint(equalTo: samplesScrollView.trailingAnchor, constant: -12),
+            samplesStackView.heightAnchor.constraint(equalTo: samplesScrollView.heightAnchor)
+        ])
+        
+        let placeholderLabel = UILabel()
+        placeholderLabel.text = "Loading code samples..."
+        placeholderLabel.textColor = .secondaryLabel
+        placeholderLabel.textAlignment = .center
+        placeholderLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+        samplesScrollView.addSubview(placeholderLabel)
+            
+        NSLayoutConstraint.activate([
+            placeholderLabel.centerXAnchor.constraint(equalTo: samplesScrollView.centerXAnchor),
+            placeholderLabel.centerYAnchor.constraint(equalTo: samplesScrollView.centerYAnchor)
+        ])
     }
     
     private func setConstraints() {
-        addSubview(nameLabel)
-        addSubview(shortDescriptionLabel)
-        addSubview(locationIcon)
-        addSubview(locationLabel)
         addSubview(titleLabel)
-        addSubview(descriptionLabel)
-
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        shortDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        locationIcon.translatesAutoresizingMaskIntoConstraints = false
-        locationLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-
+      
         NSLayoutConstraint.activate([
-            nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 24),
-            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            
-            shortDescriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 12),
-            shortDescriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            shortDescriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            
-            locationIcon.topAnchor.constraint(equalTo: shortDescriptionLabel.bottomAnchor, constant: 16),
-            locationIcon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            
-            locationLabel.topAnchor.constraint(
-                equalTo: locationIcon.topAnchor
-            ),
-            locationLabel.bottomAnchor.constraint(
-                equalTo: locationIcon.bottomAnchor
-            ),
-            locationLabel.leadingAnchor.constraint(equalTo: locationIcon.trailingAnchor, constant: 4),
-            locationLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            
-            titleLabel.topAnchor.constraint(equalTo: locationIcon.bottomAnchor, constant: 32),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
         ])
     }
     

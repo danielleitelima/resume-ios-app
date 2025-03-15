@@ -1,24 +1,32 @@
 import UIKit
 
 class PersonalDataSection: UIView {
-    private let stackView = UIStackView()
-    private let emailLabel = UILabel()
+    private let nameLabel = UILabel()
+    private let shortDescriptionLabel = UILabel()
+    private let locationIcon: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "mappin.and.ellipse"))
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     private let locationLabel = UILabel()
-    private let linkedinLabel = UILabel()
-    private let githubLabel = UILabel()
+    private let titleLabel = UILabel()
+    private let descriptionLabel = UILabel()
     
     @discardableResult
     func setData(
-        imageURL: URL,
         name: String,
-        description: String,
-        location: String
-    ) -> ContactInfoView {
-        
-        emailLabel.text = email
+        shortDescription: String,
+        location: String,
+        title: String,
+        description: String
+    ) -> PersonalDataSection {
+       
+        nameLabel.text = name
+        shortDescriptionLabel.text = shortDescription
         locationLabel.text = location
-        linkedinLabel.text = linkedin
-        githubLabel.text = github
+        titleLabel.text = title
+        descriptionLabel.text = description
         
         return self
     }
@@ -26,35 +34,76 @@ class PersonalDataSection: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        stackView.axis = .vertical
-        stackView.spacing = 8
-        stackView.alignment = .center
-        stackView.distribution = .fillEqually
+        backgroundColor = .systemGray6
+        layer.cornerRadius = 12
         
-        [emailLabel, locationLabel, linkedinLabel, githubLabel].forEach { label in
-            label.font = UIFont.systemFont(ofSize: 16)
-            label.textColor = .systemGray
-            label.textAlignment = .center
-        }
+        nameLabel.font = .systemFont(ofSize: 36, weight: .regular)
+        shortDescriptionLabel.font = .systemFont(ofSize: 16, weight: .regular)
+        locationLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        titleLabel.font = .systemFont(ofSize: 24, weight: .regular)
+        descriptionLabel.font = .systemFont(ofSize: 14, weight: .regular)
         
-        stackView.addArrangedSubview(emailLabel)
-        stackView.addArrangedSubview(locationLabel)
-        stackView.addArrangedSubview(linkedinLabel)
-        stackView.addArrangedSubview(githubLabel)
+        nameLabel.textColor = .label
+        shortDescriptionLabel.textColor = .label
+        locationIcon.tintColor = .label
+        locationLabel.textColor = .label
+        titleLabel.textColor = .label
+        descriptionLabel.textColor = .label
+        
+        nameLabel.numberOfLines = 0
+        shortDescriptionLabel.numberOfLines = 0
+        locationLabel.numberOfLines = 0
+        titleLabel.numberOfLines = 0
+        descriptionLabel.numberOfLines = 0
         
         setConstraints()
     }
     
     private func setConstraints() {
-        addSubview(stackView)
+        addSubview(nameLabel)
+        addSubview(shortDescriptionLabel)
+        addSubview(locationIcon)
+        addSubview(locationLabel)
+        addSubview(titleLabel)
+        addSubview(descriptionLabel)
 
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        shortDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        locationIcon.translatesAutoresizingMaskIntoConstraints = false
+        locationLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 24),
+            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            
+            shortDescriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 12),
+            shortDescriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            shortDescriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            
+            locationIcon.topAnchor.constraint(equalTo: shortDescriptionLabel.bottomAnchor, constant: 16),
+            locationIcon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            
+            locationLabel.topAnchor.constraint(
+                equalTo: locationIcon.topAnchor
+            ),
+            locationLabel.bottomAnchor.constraint(
+                equalTo: locationIcon.bottomAnchor
+            ),
+            locationLabel.leadingAnchor.constraint(equalTo: locationIcon.trailingAnchor, constant: 4),
+            locationLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            
+            titleLabel.topAnchor.constraint(equalTo: locationIcon.bottomAnchor, constant: 32),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+           
+            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
         ])
     }
     

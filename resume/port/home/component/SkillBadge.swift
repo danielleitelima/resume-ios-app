@@ -1,15 +1,12 @@
 import UIKit
 
-class SampleCard: UIView {
-    private let thumbnailImageView = UIImageView()
-    private let titleLabel = UILabel()
+class SkillBadge: UIView {
+    private let iconImageView = UIImageView()
     private let descriptionLabel = UILabel()
     var onClick: (() -> Void)?
     
     @discardableResult
-    func setData(title: String, description: String, imageURL: URL?) -> SampleCard {
-        
-        titleLabel.text = title
+    func setData(description: String, imageURL: URL?) -> SkillBadge {
         descriptionLabel.text = description
         
         setPlaceholderImage()
@@ -18,7 +15,9 @@ class SampleCard: UIView {
             let placeholder = UIImage(systemName: "doc.text.fill") ?? UIImage()
             
             getRemoteImage(url: imageURL, placeholder: placeholder){ [weak self] image in
-                self?.thumbnailImageView.image = image
+                self?.iconImageView.image = image
+                self?.iconImageView.backgroundColor = .clear
+                self?.iconImageView.contentMode = .scaleAspectFit
             }.resume()
         }
         
@@ -28,7 +27,7 @@ class SampleCard: UIView {
     init() {
         super.init(frame: .zero)
     
-        backgroundColor = .systemGray6
+        backgroundColor = .systemGray5
         layer.cornerRadius = 8
         clipsToBounds = true
         
@@ -37,26 +36,23 @@ class SampleCard: UIView {
         layer.shadowRadius = 4
         layer.shadowOpacity = 0.1
         
-        thumbnailImageView.contentMode = .scaleAspectFill
-        thumbnailImageView.clipsToBounds = true
-        thumbnailImageView.backgroundColor = .systemGray5
-        
-        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        titleLabel.textColor = .label
+        iconImageView.contentMode = .scaleAspectFill
+        iconImageView.clipsToBounds = true
+        iconImageView.backgroundColor = .systemGray5
 
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
-        descriptionLabel.textColor = .secondaryLabel
-        descriptionLabel.numberOfLines = 3
+        descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        descriptionLabel.textColor = .label
+        descriptionLabel.numberOfLines = 1
    
         setupConstraints()
         setGestures()
     }
     
     private func setPlaceholderImage() {
-        thumbnailImageView.image = UIImage(systemName: "doc.text.fill")
-        thumbnailImageView.tintColor = .systemGray3
-        thumbnailImageView.contentMode = .scaleAspectFit
-        thumbnailImageView.backgroundColor = .systemGray6
+        iconImageView.image = UIImage(systemName: "doc.text.fill")
+        iconImageView.tintColor = .systemGray3
+        iconImageView.contentMode = .scaleAspectFit
+        iconImageView.backgroundColor = .systemGray6
     }
     
     private func setGestures() {
@@ -70,31 +66,39 @@ class SampleCard: UIView {
     }
     
     private func setupConstraints() {
-        addSubview(thumbnailImageView)
-        addSubview(titleLabel)
+        addSubview(iconImageView)
         addSubview(descriptionLabel)
         
-        thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        iconImageView.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            heightAnchor.constraint(equalToConstant: 220),
+            // Icon constraints
+            iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            iconImageView.widthAnchor.constraint(equalToConstant: 18),
+            iconImageView.heightAnchor.constraint(equalToConstant: 18),
             
-            thumbnailImageView.topAnchor.constraint(equalTo: topAnchor),
-            thumbnailImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            thumbnailImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            thumbnailImageView.heightAnchor.constraint(equalToConstant: 120),
-            
-            titleLabel.topAnchor.constraint(equalTo: thumbnailImageView.bottomAnchor, constant: 8),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            // Label constraints
+            descriptionLabel.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 8),
             descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -8)
+            descriptionLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            
+            // Badge height
+            heightAnchor.constraint(greaterThanOrEqualToConstant: 34),
+            
+            // Top and bottom constraints to ensure proper vertical sizing
+            topAnchor.constraint(lessThanOrEqualTo: iconImageView.topAnchor, constant: -8),
+            bottomAnchor.constraint(greaterThanOrEqualTo: iconImageView.bottomAnchor, constant: 8)
         ])
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        let labelSize = descriptionLabel.intrinsicContentSize
+        let width = 8 + 18 + 8 + labelSize.width + 12 // spacing + icon + spacing + label + right padding
+        let height = max(34, labelSize.height + 16) // Ensure minimum height
+        
+        return CGSize(width: width, height: height)
     }
     
     required init?(coder: NSCoder) {

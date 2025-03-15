@@ -1,24 +1,23 @@
 import UIKit
 
-class SampleCard: UIView {
-    private let thumbnailImageView = UIImageView()
-    private let titleLabel = UILabel()
+class LanguageCard: UIView {
+    private let flagImageView = UIImageView()
+    private let nameLabel = UILabel()
     private let descriptionLabel = UILabel()
-    var onClick: (() -> Void)?
     
     @discardableResult
-    func setData(title: String, description: String, imageURL: URL?) -> SampleCard {
+    func setData(name: String, description: String, imageURL: URL?) -> LanguageCard {
         
-        titleLabel.text = title
+        nameLabel.text = name
         descriptionLabel.text = description
         
         setPlaceholderImage()
         
         if let imageURL {
-            let placeholder = UIImage(systemName: "doc.text.fill") ?? UIImage()
+            let placeholder = UIImage(systemName: "globe") ?? UIImage()
             
             getRemoteImage(url: imageURL, placeholder: placeholder){ [weak self] image in
-                self?.thumbnailImageView.image = image
+                self?.flagImageView.image = image
             }.resume()
         }
         
@@ -37,63 +36,52 @@ class SampleCard: UIView {
         layer.shadowRadius = 4
         layer.shadowOpacity = 0.1
         
-        thumbnailImageView.contentMode = .scaleAspectFill
-        thumbnailImageView.clipsToBounds = true
-        thumbnailImageView.backgroundColor = .systemGray5
+        flagImageView.contentMode = .scaleAspectFill
+        flagImageView.clipsToBounds = true
+        flagImageView.backgroundColor = .systemGray5
         
-        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        titleLabel.textColor = .label
+        nameLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        nameLabel.textColor = .label
 
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         descriptionLabel.textColor = .secondaryLabel
-        descriptionLabel.numberOfLines = 3
    
         setupConstraints()
-        setGestures()
     }
     
     private func setPlaceholderImage() {
-        thumbnailImageView.image = UIImage(systemName: "doc.text.fill")
-        thumbnailImageView.tintColor = .systemGray3
-        thumbnailImageView.contentMode = .scaleAspectFit
-        thumbnailImageView.backgroundColor = .systemGray6
-    }
-    
-    private func setGestures() {
-        isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(internalOnClick))
-        addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func internalOnClick() {
-        onClick?()
+        flagImageView.image = UIImage(systemName: "globe")
+        flagImageView.tintColor = .systemGray3
+        flagImageView.contentMode = .scaleAspectFit
+        flagImageView.backgroundColor = .systemGray6
     }
     
     private func setupConstraints() {
-        addSubview(thumbnailImageView)
-        addSubview(titleLabel)
+        addSubview(flagImageView)
+        addSubview(nameLabel)
         addSubview(descriptionLabel)
         
-        thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        flagImageView.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            heightAnchor.constraint(equalToConstant: 220),
+            heightAnchor.constraint(equalToConstant: 24 + 36 + 24),
             
-            thumbnailImageView.topAnchor.constraint(equalTo: topAnchor),
-            thumbnailImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            thumbnailImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            thumbnailImageView.heightAnchor.constraint(equalToConstant: 120),
+            flagImageView.topAnchor.constraint(equalTo: topAnchor, constant: 24),
+            flagImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            flagImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
+            flagImageView.heightAnchor.constraint(equalToConstant: 36),
+            flagImageView.widthAnchor.constraint(equalToConstant: 48),
             
-            titleLabel.topAnchor.constraint(equalTo: thumbnailImageView.bottomAnchor, constant: 8),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 24),
+            nameLabel.leadingAnchor.constraint(equalTo: flagImageView.trailingAnchor, constant: 24),
+            nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
             
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -8)
+            descriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor),
+            descriptionLabel.leadingAnchor.constraint(equalTo: flagImageView.trailingAnchor, constant: 24),
+            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
         ])
     }
     
