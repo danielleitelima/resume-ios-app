@@ -1,5 +1,7 @@
 import UIKit
 
+import BrandTheme
+
 class SkillBadge: UIView {
     private let iconImageView = UIImageView()
     private let descriptionLabel = UILabel()
@@ -27,7 +29,7 @@ class SkillBadge: UIView {
     init() {
         super.init(frame: .zero)
     
-        backgroundColor = .systemGray5
+        backgroundColor = BrandColor.secondaryContainer.load()
         layer.cornerRadius = 8
         clipsToBounds = true
         

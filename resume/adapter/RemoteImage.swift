@@ -1,10 +1,3 @@
-//
-//  RemoteImage.swift
-//  resume
-//
-//  Created by Daniel Leite Lima on 14.03.25.
-//
-
 import Foundation
 import UIKit
 

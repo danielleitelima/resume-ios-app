@@ -5,9 +5,11 @@ class LanguageCard: UIView {
     private let nameLabel = UILabel()
     private let descriptionLabel = UILabel()
     
+    
     @discardableResult
     func setData(name: String, description: String, imageURL: URL?) -> LanguageCard {
-        
+
+                
         nameLabel.text = name
         descriptionLabel.text = description
         

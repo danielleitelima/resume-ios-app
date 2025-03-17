@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E077943D2D88D6E700BC9B03 /* BrandTheme in Frameworks */ = {isa = PBXBuildFile; productRef = E077943C2D88D6E700BC9B03 /* BrandTheme */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E04A6B5A2D7F5BA400F8F069 /* resume.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = resume.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E077943D2D88D6E700BC9B03 /* BrandTheme in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = resume;
 			packageProductDependencies = (
+				E077943C2D88D6E700BC9B03 /* BrandTheme */,
 			);
 			productName = resume;
 			productReference = E04A6B5A2D7F5BA400F8F069 /* resume.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = E04A6B512D7F5BA400F8F069;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E077943B2D88D6E700BC9B03 /* XCRemoteSwiftPackageReference "brand-theme-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E04A6B5B2D7F5BA400F8F069 /* Products */;
 			projectDirPath = "";
@@ -341,6 +350,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E077943B2D88D6E700BC9B03 /* XCRemoteSwiftPackageReference "brand-theme-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielleitelima/brand-theme-ios";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E077943C2D88D6E700BC9B03 /* BrandTheme */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E077943B2D88D6E700BC9B03 /* XCRemoteSwiftPackageReference "brand-theme-ios" */;
+			productName = BrandTheme;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E04A6B522D7F5BA400F8F069 /* Project object */;
 }
