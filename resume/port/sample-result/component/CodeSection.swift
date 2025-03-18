@@ -29,7 +29,7 @@ class CodeSection: UIView {
     
     private func setup(){
         // Setup source code view
-        backgroundColor = .systemGray6
+        backgroundColor = .surfaceContainer
         layer.cornerRadius = 8
         translatesAutoresizingMaskIntoConstraints = false
                 

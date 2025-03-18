@@ -72,12 +72,6 @@ class InputSection: UIView {
             let fieldContainer = UIView()
             fieldContainer.translatesAutoresizingMaskIntoConstraints = false
             
-            let fieldLabel = UILabel()
-            let isRequired = required.contains(key)
-            fieldLabel.text = key + (isRequired ? " *" : "")
-            fieldLabel.font = UIFont.systemFont(ofSize: 16, weight: isRequired ? .bold : .regular)
-            fieldLabel.translatesAutoresizingMaskIntoConstraints = false
-            
             // Add description if available
             let descriptionLabel = UILabel()
             if let description = fieldInfo["description"] as? String {
@@ -88,7 +82,6 @@ class InputSection: UIView {
                 descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
             }
             
-            fieldContainer.addSubview(fieldLabel)
             fieldContainer.addSubview(descriptionLabel)
             
             // Determine field type
@@ -96,19 +89,19 @@ class InputSection: UIView {
                 switch type {
                 case "array":
                     // Handle array type
-                    setupArrayField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, fieldLabel: fieldLabel, descriptionLabel: descriptionLabel)
+                    setupArrayField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, descriptionLabel: descriptionLabel)
                 case "boolean":
                     // Boolean input - use a toggle/switch
-                    setupBooleanField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, fieldLabel: fieldLabel, descriptionLabel: descriptionLabel)
+                    setupBooleanField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, descriptionLabel: descriptionLabel)
                 case "string":
                     // String input
-                    setupTextField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, fieldLabel: fieldLabel, descriptionLabel: descriptionLabel, keyboardType: .default)
+                    setupTextField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, descriptionLabel: descriptionLabel, keyboardType: .default)
                 case "integer":
                     // Integer input
-                    setupTextField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, fieldLabel: fieldLabel, descriptionLabel: descriptionLabel, keyboardType: .numberPad)
+                    setupTextField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, descriptionLabel: descriptionLabel, keyboardType: .numberPad)
                 case "number":
                     // Float input
-                    setupTextField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, fieldLabel: fieldLabel, descriptionLabel: descriptionLabel, keyboardType: .decimalPad)
+                    setupTextField(key: key, fieldInfo: fieldInfo, fieldContainer: fieldContainer, descriptionLabel: descriptionLabel, keyboardType: .decimalPad)
                 default:
                     // Unsupported type
                     let typeLabel = UILabel()
@@ -120,11 +113,7 @@ class InputSection: UIView {
                     fieldContainer.addSubview(typeLabel)
                     
                     NSLayoutConstraint.activate([
-                        fieldLabel.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
-                        fieldLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
-                        fieldLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-                        
-                        descriptionLabel.topAnchor.constraint(equalTo: fieldLabel.bottomAnchor, constant: 4),
+                        descriptionLabel.topAnchor.constraint(equalTo: fieldContainer.bottomAnchor, constant: 4),
                         descriptionLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
                         descriptionLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
                         
@@ -153,7 +142,7 @@ class InputSection: UIView {
     }
     
     // Setup array field
-    private func setupArrayField(key: String, fieldInfo: [String: Any], fieldContainer: UIView, fieldLabel: UILabel, descriptionLabel: UILabel) {
+    private func setupArrayField(key: String, fieldInfo: [String: Any], fieldContainer: UIView, descriptionLabel: UILabel) {
         // Create a container for the array items
         let arrayContainer = UIStackView()
         arrayContainer.axis = .vertical
@@ -161,6 +150,12 @@ class InputSection: UIView {
         arrayContainer.alignment = .fill
         arrayContainer.distribution = .equalSpacing
         arrayContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Title for the array section
+        let titleLabel = UILabel()
+        titleLabel.text = key
+        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Add buttons to add/remove items
         let buttonContainer = UIStackView()
@@ -200,16 +195,18 @@ class InputSection: UIView {
         }, for: .touchUpInside)
         
         // Add to view hierarchy
-        fieldContainer.addSubview(arrayContainer)
+        fieldContainer.addSubview(titleLabel)
+        fieldContainer.addSubview(descriptionLabel)
         fieldContainer.addSubview(buttonContainer)
+        fieldContainer.addSubview(arrayContainer)
         
         // Set constraints
         NSLayoutConstraint.activate([
-            fieldLabel.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
-            fieldLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
-            fieldLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
             
-            descriptionLabel.topAnchor.constraint(equalTo: fieldLabel.bottomAnchor, constant: 4),
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             descriptionLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
             descriptionLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
             
@@ -221,7 +218,7 @@ class InputSection: UIView {
             arrayContainer.topAnchor.constraint(equalTo: buttonContainer.bottomAnchor, constant: 8),
             arrayContainer.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
             arrayContainer.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-            arrayContainer.bottomAnchor.constraint(equalTo: fieldContainer.bottomAnchor)
+            arrayContainer.bottomAnchor.constraint(equalTo: fieldContainer.bottomAnchor, constant: -8)
         ])
         
         // Add default items if available
@@ -240,7 +237,7 @@ class InputSection: UIView {
         // Create a container for this item
         let itemContainer = UIView()
         itemContainer.translatesAutoresizingMaskIntoConstraints = false
-        itemContainer.backgroundColor = .systemGray6
+        itemContainer.backgroundColor = .surfaceContainer
         itemContainer.layer.cornerRadius = 5
         
         // Create an index label
@@ -256,15 +253,13 @@ class InputSection: UIView {
             
             switch itemType {
             case "string":
-                let textField = UITextField()
-                textField.borderStyle = .roundedRect
+                let textField = MaterialTextField(title: "Item \(itemIndex)")
                 textField.placeholder = "Enter text"
                 textField.translatesAutoresizingMaskIntoConstraints = false
                 inputField = textField
                 
             case "integer":
-                let textField = UITextField()
-                textField.borderStyle = .roundedRect
+                let textField = MaterialTextField(title: "Item \(itemIndex)")
                 textField.placeholder = "Enter number"
                 textField.keyboardType = .numberPad
                 textField.translatesAutoresizingMaskIntoConstraints = false
@@ -280,8 +275,7 @@ class InputSection: UIView {
                 }
                 
             case "number":
-                let textField = UITextField()
-                textField.borderStyle = .roundedRect
+                let textField = MaterialTextField(title: "Item \(itemIndex)")
                 textField.placeholder = "Enter decimal"
                 textField.keyboardType = .decimalPad
                 textField.translatesAutoresizingMaskIntoConstraints = false
@@ -306,19 +300,32 @@ class InputSection: UIView {
             
             // Set constraints
             NSLayoutConstraint.activate([
+                itemContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 50),
+                
                 indexLabel.leadingAnchor.constraint(equalTo: itemContainer.leadingAnchor, constant: 8),
                 indexLabel.centerYAnchor.constraint(equalTo: itemContainer.centerYAnchor),
                 indexLabel.widthAnchor.constraint(equalToConstant: 30),
                 
-                inputField.leadingAnchor.constraint(equalTo: indexLabel.trailingAnchor, constant: 8),
+                inputField.leadingAnchor.constraint(equalTo: indexLabel.trailingAnchor),
                 inputField.trailingAnchor.constraint(equalTo: itemContainer.trailingAnchor, constant: -8),
-                inputField.centerYAnchor.constraint(equalTo: itemContainer.centerYAnchor),
-                
-                itemContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
+                inputField.topAnchor.constraint(equalTo: itemContainer.topAnchor, constant: 8),
+                inputField.bottomAnchor.constraint(equalTo: itemContainer.bottomAnchor, constant: -8)
+            ])
+            
+            // Add some padding around the container
+            let containerWrapper = UIView()
+            containerWrapper.translatesAutoresizingMaskIntoConstraints = false
+            containerWrapper.addSubview(itemContainer)
+            
+            NSLayoutConstraint.activate([
+                itemContainer.topAnchor.constraint(equalTo: containerWrapper.topAnchor, constant: 4),
+                itemContainer.leadingAnchor.constraint(equalTo: containerWrapper.leadingAnchor),
+                itemContainer.trailingAnchor.constraint(equalTo: containerWrapper.trailingAnchor),
+                itemContainer.bottomAnchor.constraint(equalTo: containerWrapper.bottomAnchor, constant: -4)
             ])
             
             // Add to array container
-            arrayContainer.addArrangedSubview(itemContainer)
+            arrayContainer.addArrangedSubview(containerWrapper)
             
             // Store the input field
             if var fields = arrayFields[key] {
@@ -332,7 +339,7 @@ class InputSection: UIView {
             if let defaultValues = fieldInfo["default"] as? [Any], itemIndex < defaultValues.count {
                 let defaultValue = defaultValues[itemIndex]
                 
-                if let textField = inputField as? UITextField {
+                if let textField = inputField as? MaterialTextField {
                     textField.text = "\(defaultValue)"
                 } else if let switchControl = inputField as? UISwitch, let boolValue = defaultValue as? Bool {
                     switchControl.isOn = boolValue
@@ -361,7 +368,7 @@ class InputSection: UIView {
     }
     
     // Setup boolean field
-    private func setupBooleanField(key: String, fieldInfo: [String: Any], fieldContainer: UIView, fieldLabel: UILabel, descriptionLabel: UILabel) {
+    private func setupBooleanField(key: String, fieldInfo: [String: Any], fieldContainer: UIView, descriptionLabel: UILabel) {
         // Boolean input - use a toggle/switch
         let switchControl = UISwitch()
         // Convert value to boolean (default to false if conversion fails)
@@ -387,32 +394,30 @@ class InputSection: UIView {
         inputFields[key] = switchControl
         
         NSLayoutConstraint.activate([
-            fieldLabel.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
-            fieldLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
-            fieldLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: fieldLabel.bottomAnchor, constant: 4),
-            descriptionLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-            
-            valueLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 12),
+            valueLabel.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
             valueLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
             
             switchControl.centerYAnchor.constraint(equalTo: valueLabel.centerYAnchor),
-            switchControl.leadingAnchor.constraint(equalTo: valueLabel.trailingAnchor, constant: 8),
+            switchControl.leadingAnchor.constraint(equalTo: valueLabel.trailingAnchor),
             switchControl.trailingAnchor.constraint(lessThanOrEqualTo: fieldContainer.trailingAnchor),
-            switchControl.bottomAnchor.constraint(equalTo: fieldContainer.bottomAnchor, constant: -8)
+            
+            descriptionLabel.topAnchor.constraint(equalTo: switchControl.bottomAnchor, constant: 8),
+            descriptionLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: fieldContainer.bottomAnchor, constant: -8)
         ])
+        
+        // Set a minimum height for the field container
+        fieldContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
     }
     
     // Setup text field
-    private func setupTextField(key: String, fieldInfo: [String: Any], fieldContainer: UIView, fieldLabel: UILabel, descriptionLabel: UILabel, keyboardType: UIKeyboardType) {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
+    private func setupTextField(key: String, fieldInfo: [String: Any], fieldContainer: UIView, descriptionLabel: UILabel, keyboardType: UIKeyboardType) {
+        let textField = MaterialTextField(title: key)
         textField.placeholder = "Enter value"
         textField.keyboardType = keyboardType
+        textField.backgroundColor = .surface
         
-        // Set default value if available
         if let defaultValue = fieldInfo["default"] {
             textField.text = "\(defaultValue)"
         }
@@ -423,19 +428,18 @@ class InputSection: UIView {
         inputFields[key] = textField
         
         NSLayoutConstraint.activate([
-            fieldLabel.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
-            fieldLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
-            fieldLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: fieldLabel.bottomAnchor, constant: 4),
-            descriptionLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-            
-            textField.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 8),
+            textField.topAnchor.constraint(equalTo: fieldContainer.topAnchor),
             textField.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
-            textField.bottomAnchor.constraint(equalTo: fieldContainer.bottomAnchor, constant: -8)
+            
+            descriptionLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 4),
+            descriptionLabel.leadingAnchor.constraint(equalTo: fieldContainer.leadingAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: fieldContainer.trailingAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: fieldContainer.bottomAnchor, constant: -8)
         ])
+        
+        // Set a minimum height for the field container
+        fieldContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 80).isActive = true
     }
     
     func getInputValues() -> [String: Any] {
@@ -447,7 +451,7 @@ class InputSection: UIView {
         
         // Process regular input fields
         for (key, inputField) in inputFields {
-            if let textField = inputField as? UITextField, let fieldInfo = properties[key] as? [String: Any] {
+            if let textField = inputField as? MaterialTextField, let fieldInfo = properties[key] as? [String: Any] {
                 if let type = fieldInfo["type"] as? String {
                     switch type {
                     case "integer":
@@ -484,7 +488,7 @@ class InputSection: UIView {
                let itemType = items["type"] as? String {
                 
                 for field in fields {
-                    if let textField = field as? UITextField {
+                    if let textField = field as? MaterialTextField {
                         switch itemType {
                         case "integer":
                             if let text = textField.text, !text.isEmpty, let intValue = Int(text) {
@@ -531,10 +535,9 @@ class InputSection: UIView {
         // Validate regular fields
         for key in required {
             if let inputField = inputFields[key] {
-                if let textField = inputField as? UITextField, let text = textField.text, text.isEmpty {
+                if let materialTextField = inputField as? MaterialTextField, let text = materialTextField.text, text.isEmpty {
                     errorMessage = "'\(key)' is required."
-                    textField.layer.borderColor = UIColor.systemRed.cgColor
-                    textField.layer.borderWidth = 1
+                    materialTextField.setError(true)
                     break
                 }
             } else if arrayFields[key] == nil || arrayFields[key]?.isEmpty == true {
@@ -551,30 +554,28 @@ class InputSection: UIView {
             }
             
             for (index, field) in fields.enumerated() {
-                if let textField = field as? UITextField,
+                if let materialTextField = field as? MaterialTextField,
                    let fieldInfo = properties[key] as? [String: Any],
                    let items = fieldInfo["items"] as? [String: Any],
                    let itemType = items["type"] as? String {
                     
-                    if let text = textField.text, !text.isEmpty {
+                    if let text = materialTextField.text, !text.isEmpty {
                         switch itemType {
                         case "integer":
                             if Int(text) == nil {
                                 errorMessage = "'\(key)[\(index)]' must be a valid integer."
-                                textField.layer.borderColor = UIColor.systemRed.cgColor
-                                textField.layer.borderWidth = 1
+                                materialTextField.setError(true)
                                 break
                             } else {
-                                textField.layer.borderWidth = 0
+                                materialTextField.setError(false)
                             }
                         case "number":
                             if Double(text) == nil {
                                 errorMessage = "'\(key)[\(index)]' must be a valid decimal number."
-                                textField.layer.borderColor = UIColor.systemRed.cgColor
-                                textField.layer.borderWidth = 1
+                                materialTextField.setError(true)
                                 break
                             } else {
-                                textField.layer.borderWidth = 0
+                                materialTextField.setError(false)
                             }
                         default:
                             break

@@ -20,9 +20,10 @@ class IntroductionSection: UIView {
     
     init() {
         super.init(frame: .zero)
-        titleLabel.font = UIFont.systemFont(ofSize: 24, weight: .regular)
+        titleLabel.font = .headlineSmall
         titleLabel.numberOfLines = 0
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        
+        descriptionLabel.font = .bodyMedium
         descriptionLabel.numberOfLines = 0
 
         setConstraints()

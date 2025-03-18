@@ -7,10 +7,54 @@ class SampleDetailScreen: UIViewController {
     private let contentView = UIView()
 
     private let introductionSection = IntroductionSection()
-    private let separator = UIView()
+    private let customDivider: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.primary))
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     private let inputSection = InputSection()
     
-    private let runButton = UIButton(type: .system)
+    private let runButton: UIButton = {
+        let button = UIButton(type: .system)
+        
+        // Create horizontal stack view for icon and text
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+        
+        let iconImage = UIImage(named: "ic-send")?.withTintColor(.onPrimary, renderingMode: .alwaysTemplate)
+        
+        let iconImageView = UIImageView(image: iconImage)
+        iconImageView.tintColor = .onPrimary
+        iconImageView.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        iconImageView.widthAnchor.constraint(equalToConstant: 18).isActive = true
+        
+        // Create and configure label
+        let label = UILabel()
+        label.text = "Execute"
+        label.textColor = .onPrimary
+        label.font = .labelLarge
+        
+        stackView.addArrangedSubview(iconImageView)
+        stackView.addArrangedSubview(label)
+        
+        button.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Center stack view in button
+        NSLayoutConstraint.activate([
+            stackView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            stackView.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
+        
+        button.backgroundColor = .primary
+        button.layer.cornerRadius = 20  // Make it completely round
+        
+        return button
+    }()
+    
     private let loadingIndicator = UIActivityIndicatorView(style: .medium)
     
     init(sample: CodeSample) {
@@ -22,10 +66,9 @@ class SampleDetailScreen: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        title = "Code Sample"
+        view.backgroundColor = .surface
+        title = "Sample"
         
-        // Add close button
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,
@@ -60,19 +103,11 @@ class SampleDetailScreen: UIViewController {
         introductionSection.translatesAutoresizingMaskIntoConstraints = false
         
         introductionSection.setData(title: sample.Name, description: sample.Description)
-        
-        separator.backgroundColor = .systemGray4
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
 
+        customDivider.translatesAutoresizingMaskIntoConstraints = false
+        
         inputSection.translatesAutoresizingMaskIntoConstraints = false
         
-        // Setup run button
-        runButton.setTitle("Run Code Sample", for: .normal)
-        runButton.backgroundColor = .systemBlue
-        runButton.setTitleColor(.white, for: .normal)
-        runButton.layer.cornerRadius = 10
-        runButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         runButton.translatesAutoresizingMaskIntoConstraints = false
         runButton.addTarget(self, action: #selector(runButtonTapped), for: .touchUpInside)
         
@@ -81,7 +116,7 @@ class SampleDetailScreen: UIViewController {
         loadingIndicator.hidesWhenStopped = true
         
         contentView.addSubview(introductionSection)
-        contentView.addSubview(separator)
+        contentView.addSubview(customDivider)
         contentView.addSubview(inputSection)
         contentView.addSubview(runButton)
         contentView.addSubview(loadingIndicator)
@@ -92,19 +127,19 @@ class SampleDetailScreen: UIViewController {
             introductionSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             introductionSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            separator.topAnchor.constraint(equalTo: introductionSection.bottomAnchor, constant: 32),
-            separator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            customDivider.topAnchor.constraint(equalTo: introductionSection.bottomAnchor, constant: 32),
+            customDivider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            customDivider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            inputSection.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 32),
+            inputSection.topAnchor.constraint(equalTo: customDivider.bottomAnchor, constant: 32),
             inputSection.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             inputSection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
             runButton.topAnchor.constraint(equalTo: inputSection.bottomAnchor, constant: 32),
-            runButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             runButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            runButton.heightAnchor.constraint(equalToConstant: 50),
-          
+            runButton.heightAnchor.constraint(equalToConstant: 40),
+            runButton.widthAnchor.constraint(equalToConstant: 120),  // Add fixed width for pill shape
+            
             loadingIndicator.centerXAnchor.constraint(equalTo: runButton.centerXAnchor),
             loadingIndicator.topAnchor.constraint(equalTo: runButton.bottomAnchor, constant: 20),
             

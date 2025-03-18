@@ -26,8 +26,8 @@ class SampleResultScreen: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        title = "Code Execution Result"
+        view.backgroundColor = .surface
+        title = "Result"
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
