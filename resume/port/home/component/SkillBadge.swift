@@ -42,8 +42,8 @@ class SkillBadge: UIView {
         iconImageView.clipsToBounds = true
         iconImageView.backgroundColor = .systemGray5
 
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        descriptionLabel.textColor = .label
+        descriptionLabel.font = BrandTheme().getFont(.labelLarge, contentSize: traitCollection.preferredContentSizeCategory)
+        descriptionLabel.textColor = BrandColor.onSecondaryContainer.load()
         descriptionLabel.numberOfLines = 1
    
         setupConstraints()
