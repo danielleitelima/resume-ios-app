@@ -14,8 +14,8 @@ class SkillBadge: UIView {
         setPlaceholderImage()
         
         if let imageURL {
-            let placeholder = UIImage(systemName: "doc.text.fill") ?? UIImage()
-            
+            let placeholder = UIImage(named: "ic-code")?.withTintColor(.onSecondaryContainer) ?? UIImage()
+
             getRemoteImage(url: imageURL, placeholder: placeholder){ [weak self] image in
                 self?.iconImageView.image = image
                 self?.iconImageView.backgroundColor = .clear
@@ -29,7 +29,7 @@ class SkillBadge: UIView {
     init() {
         super.init(frame: .zero)
     
-        backgroundColor = BrandColor.secondaryContainer.load()
+        backgroundColor = .secondaryContainer
         layer.cornerRadius = 8
         clipsToBounds = true
         
@@ -40,10 +40,10 @@ class SkillBadge: UIView {
         
         iconImageView.contentMode = .scaleAspectFill
         iconImageView.clipsToBounds = true
-        iconImageView.backgroundColor = .systemGray5
+        iconImageView.backgroundColor = .clear
 
-        descriptionLabel.font = BrandTheme().getFont(.labelLarge, contentSize: traitCollection.preferredContentSizeCategory)
-        descriptionLabel.textColor = BrandColor.onSecondaryContainer.load()
+        descriptionLabel.font = .labelLarge(for: traitCollection)
+        descriptionLabel.textColor = .onSecondaryContainer
         descriptionLabel.numberOfLines = 1
    
         setupConstraints()
@@ -51,10 +51,9 @@ class SkillBadge: UIView {
     }
     
     private func setPlaceholderImage() {
-        iconImageView.image = UIImage(systemName: "doc.text.fill")
-        iconImageView.tintColor = .systemGray3
+        iconImageView.image =  UIImage(named: "ic-code")?.withTintColor(.onSecondaryContainer)
         iconImageView.contentMode = .scaleAspectFit
-        iconImageView.backgroundColor = .systemGray6
+        iconImageView.backgroundColor = .clear
     }
     
     private func setGestures() {

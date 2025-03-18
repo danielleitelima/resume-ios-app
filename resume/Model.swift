@@ -20,6 +20,7 @@ struct CodeSample: Codable {
 
 struct PersonalData: Codable {
     let name: String
+    let title: String
     let description: String
     let location: String
     let photoUrl: String
@@ -45,13 +46,16 @@ struct Experience: Codable {
 
 struct Company: Codable {
     let name: String
-    let period: String
-    let location: String
+    let startDate: String
+    let endDate: String?
+    let location: String?
 }
 
 struct Role: Codable {
     let name: String
-    let period: String
+    let startDate: String
+    let endDate: String?
+    let location: String?
     let description: String
 }
 
@@ -65,7 +69,8 @@ struct Language: Codable {
 struct Education: Codable {
     let title: String
     let institution: String
-    let period: String
+    let startDate: String
+    let endDate: String?
     let location: String
 }
 

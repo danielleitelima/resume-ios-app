@@ -19,15 +19,11 @@ class SkillSection: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
-      
-        titleLabel.textColor = .label
+        
+        titleLabel.font = .displaySmall(for: traitCollection)
+        titleLabel.textColor = .onSurface
         titleLabel.text = "Skills"
-       
-        
         titleLabel.numberOfLines = 0
-        
         
         setConstraints()
         setupContainer()

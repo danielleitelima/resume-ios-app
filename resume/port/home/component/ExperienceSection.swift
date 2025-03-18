@@ -12,12 +12,11 @@ class ExperienceSection: UIView {
     }
     
     private func setupViews() {
-        // Configure title label
+        titleLabel.font = .displaySmall(for: traitCollection)
+        titleLabel.textColor = .onSurface
         titleLabel.text = "Experience"
-        titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
-        titleLabel.textColor = .label
+        titleLabel.numberOfLines = 0
         
-        // Configure stack view for experience cards
         stackView.axis = .vertical
         stackView.spacing = 6
         stackView.alignment = .fill
@@ -52,21 +51,16 @@ class ExperienceSection: UIView {
             let isFirst = index == 0
             let isLast = index == experiences.count - 1
             
-            // For each role in the experience, create a card
-            for (roleIndex, role) in experience.roles.enumerated() {
-                let card = ExperienceCard()
-                card.setData(
-                    companyName: experience.company.name,
-                    period: role.period,
-                    role: role.name,
-                    location: experience.company.location,
-                    description: role.description,
-                    isFirst: isFirst && roleIndex == 0,
-                    isLast: isLast && roleIndex == experience.roles.count - 1
-                )
-                
-                stackView.addArrangedSubview(card)
-            }
+            let card = ExperienceCard()
+            
+            card.setData(
+                company: experience.company,
+                roles: experience.roles,
+                isFirst: isFirst,
+                isLast: isLast
+            )
+            
+            stackView.addArrangedSubview(card)
         }
     }
     

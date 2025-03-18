@@ -4,7 +4,7 @@ import SafariServices
 class FooterSection: UIView {
     private let messageLabel = UILabel()
     private let customDivider: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.secondaryLabel))
+        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.outline))
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -44,8 +44,8 @@ class FooterSection: UIView {
         super.init(frame: frame)
         
         messageLabel.text = "Let's talk!"
-        messageLabel.font = UIFont.systemFont(ofSize: 32, weight: .regular)
-        messageLabel.textColor = .secondaryLabel
+        messageLabel.font = .headlineLarge
+        messageLabel.textColor = .outline
         messageLabel.numberOfLines = 2
         messageLabel.textAlignment = .center
         

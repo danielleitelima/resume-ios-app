@@ -17,9 +17,9 @@ class FooterButton: UIButton {
         
         layer.cornerRadius = 24
         layer.borderWidth = 2
-        layer.borderColor = UIColor.secondaryLabel.cgColor
+        layer.borderColor = UIColor.outline.cgColor
         
-        iconImageView.tintColor = .secondaryLabel
+        iconImageView.tintColor = .outline
         iconImageView.contentMode = .scaleAspectFit
         
         setConstraints()

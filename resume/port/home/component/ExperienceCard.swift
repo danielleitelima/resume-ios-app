@@ -8,17 +8,15 @@ class ExperienceCard: UIView {
     private let calendarIcon = UIImageView()
     private let durationLabel = UILabel()
     
-    private let titleContainer = UIView()
+    private let companyContainer = UIView()
     private let companyNameLabel = UILabel()
     private let yearCountLabel = UILabel()
-    
-    private let roleLabel = UILabel()
     
     private let locationContainer = UIView()
     private let locationIcon = UIImageView()
     private let locationLabel = UILabel()
     
-    private let descriptionLabel = UILabel()
+    private var roleContentViews: [RoleContent] = []
     
     private var startYear: String = ""
     private var isFirst: Bool = false
@@ -26,162 +24,168 @@ class ExperienceCard: UIView {
     
     @discardableResult
     func setData(
-        companyName: String,
-        period: String,
-        role: String,
-        location: String,
-        description: String,
+        company: Company,
+        roles: [Role],
         isFirst: Bool,
         isLast: Bool
     ) -> ExperienceCard {
         self.isFirst = isFirst
         self.isLast = isLast
         
-        // Set the duration
-        durationLabel.text = "From \(period)"
+        let period = formatPeriod(startDate: company.startDate, endDate: company.endDate)
+        durationLabel.text = period.isEmpty ? "" : "From \(period)"
         
-        // Extract the start year from period
-        startYear = extractStartYear(from: period)
+        startYear = extractStartYear(from: company.startDate)
         
-        // Configure timeline
         timeline.setData(isFirst: isFirst, isLast: isLast, year: startYear)
         
-        // Set company name
-        companyNameLabel.text = companyName
+        companyNameLabel.text = company.name
         
-        // Calculate and set year count
-        yearCountLabel.text = calculateYearCount(from: period)
+        locationLabel.text = company.location ?? ""
+        locationContainer.isHidden = (company.location ?? "").isEmpty
         
-        // Set role and location
-        roleLabel.text = role
-        locationLabel.text = location
+        yearCountLabel.text = calculateYearCount(startDate: company.startDate, endDate: company.endDate)
         
-        // Set description
-        descriptionLabel.text = description
+        roleContentViews.forEach { $0.removeFromSuperview() }
+        roleContentViews.removeAll()
         
+        for role in roles {
+            let roleContent = RoleContent()
+            roleContent.setData(role: role)
+            roleContentViews.append(roleContent)
+            contentContainer.addSubview(roleContent)
+            roleContent.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        setupConstraints()
         return self
     }
     
-    private func extractStartYear(from period: String) -> String {
-        // Extract the first part of the period which should be the start year
-        let components = period.components(separatedBy: " ")
-        if components.count > 0 {
-            return components[0]
+    private func formatPeriod(startDate: String, endDate: String?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        
+        guard let start = dateFormatter.date(from: startDate) else { return "" }
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy"
+        
+        let startYear = outputFormatter.string(from: start)
+        
+        if let endDate = endDate, let end = dateFormatter.date(from: endDate) {
+            let endYear = outputFormatter.string(from: end)
+            return "\(startYear) to \(endYear)"
+        } else {
+            return "\(startYear) to Present"
         }
+    }
+    
+    private func extractStartYear(from dateString: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        
+        if let date = dateFormatter.date(from: dateString) {
+            let yearFormatter = DateFormatter()
+            yearFormatter.dateFormat = "yyyy"
+            return yearFormatter.string(from: date)
+        }
+        return ""
+    }
+    
+    private func calculateYearCount(startDate: String, endDate: String?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        
+        guard let start = dateFormatter.date(from: startDate) else { return "" }
+        
+        let end = endDate.flatMap { dateFormatter.date(from: $0) } ?? Date()
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: start, to: end)
+        
+        if let years = components.year, years > 0 {
+            return years == 1 ? "1 year" : "\(years) years"
+        } else if let months = components.month, months > 0 {
+            return months == 1 ? "1 month" : "\(months) months"
+        } else if let days = components.day, days > 0 {
+            return days == 1 ? "1 day" : "\(days) days"
+        }
+        
         return ""
     }
     
     init() {
         super.init(frame: .zero)
         
-        // Remove background color and corner radius from main view
         backgroundColor = .clear
         
-        // Apply styling to content container instead
-        contentContainer.backgroundColor = UIColor.systemGray6
-        contentContainer.layer.cornerRadius = 10
+        contentContainer.backgroundColor = .surfaceContainerLow
+        contentContainer.layer.cornerRadius = 12
+        contentContainer.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         
-        // Setup calendar icon
         calendarIcon.image = UIImage(systemName: "calendar")
-        calendarIcon.tintColor = .systemTeal
+        calendarIcon.tintColor = .primary
         
-        // Setup duration label
-        durationLabel.textColor = .systemTeal
-        durationLabel.font = .systemFont(ofSize: 16)
+        durationLabel.textColor = .onSurfaceVariant
+        durationLabel.font = .bodyMedium
         
-        // Setup company name label
-        companyNameLabel.font = .systemFont(ofSize: 22, weight: .bold)
+        companyNameLabel.font = .titleMedium
+        companyNameLabel.textColor = .onSurface
         companyNameLabel.numberOfLines = 0
         
-        // Setup year count label
-        yearCountLabel.textColor = .secondaryLabel
-        yearCountLabel.font = .systemFont(ofSize: 16)
+        yearCountLabel.textColor = .onSurfaceVariant
+        yearCountLabel.font = .labelSmall
         yearCountLabel.textAlignment = .right
         
-        // Setup role label
-        roleLabel.font = .systemFont(ofSize: 18, weight: .medium)
-        roleLabel.textColor = .label
-        
-        // Setup location icon
         locationIcon.image = UIImage(systemName: "mappin.and.ellipse")
-        locationIcon.tintColor = .label
+        locationIcon.tintColor = .onSurface
         
-        // Setup location label
-        locationLabel.font = .systemFont(ofSize: 16)
-        locationLabel.textColor = .label
+        locationLabel.font = .bodySmall
+        locationLabel.textColor = .onSurface
         
-        // Setup description label
-        descriptionLabel.font = .systemFont(ofSize: 16)
-        descriptionLabel.textColor = .label
-        descriptionLabel.numberOfLines = 0
-        
-        setupConstraints()
-    }
-    
-    private func calculateYearCount(from period: String) -> String {
-        // Assuming period format is like "2018 to 2021"
-        let components = period.components(separatedBy: " ")
-        if components.count >= 3, let startYear = Int(components[0]), let endYear = Int(components[2]) {
-            let years = endYear - startYear
-            return years == 1 ? "1 year" : "\(years) years"
-        }
-        return "1 year" // Default value
-    }
-    
-    private func setupConstraints() {
-        // Add timeline and content container directly to main view
         addSubview(timeline)
         addSubview(contentContainer)
         
-        // Add subviews to content container
         contentContainer.addSubview(durationContainer)
         durationContainer.addSubview(calendarIcon)
         durationContainer.addSubview(durationLabel)
         
-        contentContainer.addSubview(titleContainer)
-        titleContainer.addSubview(companyNameLabel)
-        titleContainer.addSubview(yearCountLabel)
-        
-        contentContainer.addSubview(roleLabel)
+        contentContainer.addSubview(companyContainer)
+        companyContainer.addSubview(companyNameLabel)
+        companyContainer.addSubview(yearCountLabel)
         
         contentContainer.addSubview(locationContainer)
         locationContainer.addSubview(locationIcon)
         locationContainer.addSubview(locationLabel)
         
-        contentContainer.addSubview(descriptionLabel)
-        
-        // Set constraints
+        setupConstraints()
+    }
+    
+    private func setupConstraints() {
         timeline.translatesAutoresizingMaskIntoConstraints = false
         contentContainer.translatesAutoresizingMaskIntoConstraints = false
         durationContainer.translatesAutoresizingMaskIntoConstraints = false
         calendarIcon.translatesAutoresizingMaskIntoConstraints = false
         durationLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        titleContainer.translatesAutoresizingMaskIntoConstraints = false
+        companyContainer.translatesAutoresizingMaskIntoConstraints = false
         companyNameLabel.translatesAutoresizingMaskIntoConstraints = false
         yearCountLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        roleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         locationContainer.translatesAutoresizingMaskIntoConstraints = false
         locationIcon.translatesAutoresizingMaskIntoConstraints = false
         locationLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        
         NSLayoutConstraint.activate([
-            // Timeline constraints - keep it on the left side
-            timeline.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            timeline.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             timeline.topAnchor.constraint(equalTo: topAnchor),
             timeline.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            // Content container - now positioned with 48pt top margin
-            contentContainer.leadingAnchor.constraint(equalTo: timeline.trailingAnchor, constant: 8),
-            contentContainer.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentContainer.topAnchor.constraint(equalTo: topAnchor, constant: 24), // 48pt top margin
-            contentContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -71),
+            contentContainer.leadingAnchor.constraint(equalTo: timeline.trailingAnchor, constant: 12),
+            contentContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            contentContainer.topAnchor.constraint(equalTo: topAnchor, constant: 24),
+            contentContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: isLast ? -119 : -71),
             
-            // Duration container - adjust position within content container
             durationContainer.topAnchor.constraint(equalTo: contentContainer.topAnchor, constant: 24),
             durationContainer.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
             durationContainer.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -24),
@@ -195,28 +199,21 @@ class ExperienceCard: UIView {
             durationLabel.centerYAnchor.constraint(equalTo: durationContainer.centerYAnchor),
             durationLabel.trailingAnchor.constraint(equalTo: durationContainer.trailingAnchor),
             
-            // Title container
-            titleContainer.topAnchor.constraint(equalTo: durationContainer.bottomAnchor, constant: 16),
-            titleContainer.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
-            titleContainer.trailingAnchor.constraint(equalTo: yearCountLabel.leadingAnchor, constant: -24),
+            companyContainer.topAnchor.constraint(equalTo: durationContainer.bottomAnchor, constant: 24),
+            companyContainer.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
+            companyContainer.trailingAnchor.constraint(equalTo: yearCountLabel.leadingAnchor, constant: -24),
 
             yearCountLabel.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -24),
-            yearCountLabel.topAnchor.constraint(equalTo: titleContainer.topAnchor),
-            yearCountLabel.bottomAnchor.constraint(equalTo: titleContainer.bottomAnchor),
+            yearCountLabel.topAnchor.constraint(equalTo: companyContainer.topAnchor),
+            yearCountLabel.bottomAnchor.constraint(equalTo: companyContainer.bottomAnchor),
             yearCountLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 60),
             
-            companyNameLabel.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
-            companyNameLabel.topAnchor.constraint(equalTo: titleContainer.topAnchor),
-            companyNameLabel.bottomAnchor.constraint(equalTo: titleContainer.bottomAnchor),
+            companyNameLabel.leadingAnchor.constraint(equalTo: companyContainer.leadingAnchor),
+            companyNameLabel.topAnchor.constraint(equalTo: companyContainer.topAnchor),
+            companyNameLabel.bottomAnchor.constraint(equalTo: companyContainer.bottomAnchor),
             companyNameLabel.trailingAnchor.constraint(equalTo: yearCountLabel.leadingAnchor, constant: -16),
             
-            // Role label
-            roleLabel.topAnchor.constraint(equalTo: titleContainer.bottomAnchor, constant: 16),
-            roleLabel.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
-            roleLabel.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -24),
-            
-            // Location container
-            locationContainer.topAnchor.constraint(equalTo: roleLabel.bottomAnchor, constant: 12),
+            locationContainer.topAnchor.constraint(equalTo: companyContainer.bottomAnchor, constant: 16),
             locationContainer.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
             locationContainer.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -24),
             
@@ -228,13 +225,23 @@ class ExperienceCard: UIView {
             locationLabel.leadingAnchor.constraint(equalTo: locationIcon.trailingAnchor, constant: 8),
             locationLabel.centerYAnchor.constraint(equalTo: locationContainer.centerYAnchor),
             locationLabel.trailingAnchor.constraint(equalTo: locationContainer.trailingAnchor),
-            
-            // Description label
-            descriptionLabel.topAnchor.constraint(equalTo: locationContainer.bottomAnchor, constant: 16),
-            descriptionLabel.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
-            descriptionLabel.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -24),
-            descriptionLabel.bottomAnchor.constraint(equalTo: contentContainer.bottomAnchor, constant: -24)
         ])
+        
+        var previousView: UIView = locationContainer
+        
+        for (index, roleContent) in roleContentViews.enumerated() {
+            NSLayoutConstraint.activate([
+                roleContent.topAnchor.constraint(equalTo: previousView.bottomAnchor, constant: 24),
+                roleContent.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 24),
+                roleContent.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -24),
+            ])
+            
+            previousView = roleContent
+            
+            if index == roleContentViews.count - 1 {
+                roleContent.bottomAnchor.constraint(equalTo: contentContainer.bottomAnchor, constant: -24).isActive = true
+            }
+        }
     }
     
     required init?(coder: NSCoder) {

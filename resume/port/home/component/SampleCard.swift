@@ -15,7 +15,7 @@ class SampleCard: UIView {
         setPlaceholderImage()
         
         if let imageURL {
-            let placeholder = UIImage(systemName: "doc.text.fill") ?? UIImage()
+            let placeholder = UIImage(named: "sample-thumbnail-placeholder") ?? UIImage()
             
             getRemoteImage(url: imageURL, placeholder: placeholder){ [weak self] image in
                 self?.thumbnailImageView.image = image
@@ -28,7 +28,7 @@ class SampleCard: UIView {
     init() {
         super.init(frame: .zero)
     
-        backgroundColor = .systemGray6
+        backgroundColor = .surfaceContainerLow
         layer.cornerRadius = 8
         clipsToBounds = true
         
@@ -39,13 +39,13 @@ class SampleCard: UIView {
         
         thumbnailImageView.contentMode = .scaleAspectFill
         thumbnailImageView.clipsToBounds = true
-        thumbnailImageView.backgroundColor = .systemGray5
+        thumbnailImageView.backgroundColor = .surfaceContainerLow
         
-        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        titleLabel.textColor = .label
+        titleLabel.font = .titleSmall(for: traitCollection)
+        titleLabel.textColor = .onSurface
 
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
-        descriptionLabel.textColor = .secondaryLabel
+        descriptionLabel.font = .bodySmall(for: traitCollection)
+        descriptionLabel.textColor = .onSurface
         descriptionLabel.numberOfLines = 3
    
         setupConstraints()
@@ -53,10 +53,13 @@ class SampleCard: UIView {
     }
     
     private func setPlaceholderImage() {
-        thumbnailImageView.image = UIImage(systemName: "doc.text.fill")
-        thumbnailImageView.tintColor = .systemGray3
+        thumbnailImageView.image = UIImage(
+            systemName: "doc.text.fill", 
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 48)
+        )
+        thumbnailImageView.tintColor = .onSecondaryContainer
         thumbnailImageView.contentMode = .scaleAspectFit
-        thumbnailImageView.backgroundColor = .systemGray6
+        thumbnailImageView.backgroundColor = .secondaryContainer
     }
     
     private func setGestures() {

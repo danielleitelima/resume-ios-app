@@ -26,7 +26,6 @@ class SectionButton: UIButton {
         iconImageView.tintColor = .label
         iconImageView.contentMode = .scaleAspectFit
         
-        
         customTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         customTitleLabel.textColor = .label
         
@@ -36,26 +35,19 @@ class SectionButton: UIButton {
     private func applySelectionState() {
         UIView.animate(withDuration: 0.2) {
             if self.isSelected {
-                self.backgroundColor = .systemGray4
+                self.backgroundColor = .secondaryContainer
                 self.layer.borderWidth = 0
-                self.iconImageView.tintColor = .label
-                self.customTitleLabel.textColor = .label
+                self.iconImageView.tintColor = .onSecondaryContainer
+                self.customTitleLabel.textColor = .onSecondaryContainer
             } else {
                 self.backgroundColor = .clear
                 self.layer.borderWidth = 1
-                self.layer.borderColor = UIColor.systemGray.cgColor
-                self.iconImageView.tintColor = .label
-                self.customTitleLabel.textColor = .label
+                self.layer.borderColor = UIColor.onSurfaceVariant.cgColor
+                self.iconImageView.tintColor = .onSurfaceVariant
+                self.customTitleLabel.textColor = .onSurfaceVariant
             }
         }
     }
-    
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        super.traitCollectionDidChange(previousTraitCollection)
-//        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-//            applySelectionState()
-//        }
-//    }
     
     private func setConstraints(){
         addSubview(iconImageView)
@@ -66,7 +58,6 @@ class SectionButton: UIButton {
         
         NSLayoutConstraint.activate([
             heightAnchor.constraint(equalToConstant: 40),
-            widthAnchor.constraint(greaterThanOrEqualToConstant: 120),
             
             iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
             iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),

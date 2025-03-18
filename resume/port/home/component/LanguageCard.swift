@@ -4,11 +4,15 @@ class LanguageCard: UIView {
     private let flagImageView = UIImageView()
     private let nameLabel = UILabel()
     private let descriptionLabel = UILabel()
-    
+    private let languageLevelView = LanguageLevel()
     
     @discardableResult
-    func setData(name: String, description: String, imageURL: URL?) -> LanguageCard {
-
+    func setData(
+        name: String,
+        description: String,
+        imageURL: URL?,
+        level: Int
+    ) -> LanguageCard {
                 
         nameLabel.text = name
         descriptionLabel.text = description
@@ -23,13 +27,15 @@ class LanguageCard: UIView {
             }.resume()
         }
         
+        languageLevelView.setData(level: level)
+        
         return self
     }
     
     init() {
         super.init(frame: .zero)
     
-        backgroundColor = .systemGray6
+        backgroundColor = .surfaceContainerLow
         layer.cornerRadius = 8
         clipsToBounds = true
         
@@ -40,32 +46,34 @@ class LanguageCard: UIView {
         
         flagImageView.contentMode = .scaleAspectFill
         flagImageView.clipsToBounds = true
-        flagImageView.backgroundColor = .systemGray5
+        flagImageView.backgroundColor = .clear
         
-        nameLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        nameLabel.textColor = .label
+        nameLabel.font = .titleMedium
+        nameLabel.textColor = .onSurface
 
-        descriptionLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        descriptionLabel.textColor = .secondaryLabel
-   
+        descriptionLabel.font = .bodyLarge
+        descriptionLabel.textColor = .onSurfaceVariant
+
         setupConstraints()
     }
     
     private func setPlaceholderImage() {
         flagImageView.image = UIImage(systemName: "globe")
-        flagImageView.tintColor = .systemGray3
+        flagImageView.tintColor = .onSurface
         flagImageView.contentMode = .scaleAspectFit
-        flagImageView.backgroundColor = .systemGray6
+        flagImageView.backgroundColor = .clear
     }
     
     private func setupConstraints() {
         addSubview(flagImageView)
         addSubview(nameLabel)
         addSubview(descriptionLabel)
+        addSubview(languageLevelView)
         
         flagImageView.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        languageLevelView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             heightAnchor.constraint(equalToConstant: 24 + 36 + 24),
@@ -78,12 +86,15 @@ class LanguageCard: UIView {
             
             nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 24),
             nameLabel.leadingAnchor.constraint(equalTo: flagImageView.trailingAnchor, constant: 24),
-            nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            nameLabel.trailingAnchor.constraint(lessThanOrEqualTo: languageLevelView.leadingAnchor, constant: -16),
             
             descriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor),
             descriptionLabel.leadingAnchor.constraint(equalTo: flagImageView.trailingAnchor, constant: 24),
-            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
+            descriptionLabel.trailingAnchor.constraint(lessThanOrEqualTo: languageLevelView.leadingAnchor, constant: -16),
+            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
+            
+            languageLevelView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            languageLevelView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24)
         ])
     }
     

@@ -26,19 +26,13 @@ class SampleSection: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
-      
-        titleLabel.textColor = .label
+        titleLabel.font = .displaySmall(for: traitCollection)
+        titleLabel.textColor = .onSurface
         titleLabel.text = "Code samples"
-       
-        
         titleLabel.numberOfLines = 0
-        
         
         setConstraints()
         setupContainer()
-       
-        
     }
     
     func setupCarousel() {
@@ -53,9 +47,9 @@ class SampleSection: UIView {
         if samples.isEmpty {
             let emptyLabel = UILabel()
             emptyLabel.text = "No code samples available"
-            emptyLabel.textColor = .secondaryLabel
+            emptyLabel.textColor = .onSurfaceVariant
             emptyLabel.textAlignment = .center
-            emptyLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+            emptyLabel.font = .bodyLarge
             emptyLabel.translatesAutoresizingMaskIntoConstraints = false
             
             samplesScrollView.addSubview(emptyLabel)
@@ -123,9 +117,9 @@ class SampleSection: UIView {
         
         let placeholderLabel = UILabel()
         placeholderLabel.text = "Loading code samples..."
-        placeholderLabel.textColor = .secondaryLabel
+        placeholderLabel.textColor = .onSurfaceVariant
         placeholderLabel.textAlignment = .center
-        placeholderLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        placeholderLabel.font = .bodyLarge
         placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
             
         samplesScrollView.addSubview(placeholderLabel)

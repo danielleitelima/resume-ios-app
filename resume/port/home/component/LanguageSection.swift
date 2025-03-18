@@ -13,7 +13,9 @@ class LanguageSection: UIView {
         self.languages = languages
         
         // Clear existing cards
-        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        stackView.arrangedSubviews.forEach {
+            $0.removeFromSuperview()
+        }
         
         // Add a card for each language
         for language in languages {
@@ -21,7 +23,8 @@ class LanguageSection: UIView {
             card.setData(
                 name: language.name,
                 description: language.description,
-                imageURL: URL(string: language.imageUrl)
+                imageURL: URL(string: language.imageUrl),
+                level: language.level
             )
             stackView.addArrangedSubview(card)
         }
@@ -31,9 +34,9 @@ class LanguageSection: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        titleLabel.font = .systemFont(ofSize: 36, weight: .regular)
-        titleLabel.textColor = .label
+        
+        titleLabel.font = .displaySmall(for: traitCollection)
+        titleLabel.textColor = .onSurface
         titleLabel.text = "Languages"
         titleLabel.numberOfLines = 0
         

@@ -2,7 +2,6 @@ import UIKit
 
 class HomeScreen: UIViewController, UIScrollViewDelegate {
 
-    // MARK: - Properties
     let profilePhotoView = UIImageView()
    
     let scrollView = UIScrollView()
@@ -16,7 +15,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
     private let experienceSection = ExperienceSection()
     
     private let customDivider: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.systemCyan))
+        let imageView = UIImageView(image: UIImage(named: "custom-divider")?.withTintColor(.primary))
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -53,7 +52,6 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
     let skillsButton = SectionButton().setData(title: "Skills", icon: "wrench.fill")
     let experienceButton = SectionButton().setData(title: "Experience", icon: "chart.line.uptrend.xyaxis")
     let languagesButton = SectionButton().setData(title: "Languages", icon: "text.bubble.fill")
-    let articlesButton = SectionButton().setData(title: "Articles", icon: "doc.fill")
     let contactButton = SectionButton().setData(title: "Contact", icon: "questionmark.circle.fill")
     
     // Code samples carousel
@@ -64,15 +62,15 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        
+        view.backgroundColor = .surface
+                
         setupStatusBarBackground()
-        setupLoadingView()
         setupTopBar()
+        setupLoadingView()
         setupScrollView()
         setupMenuOverlay()
-
-        // Fetch resume data
+//
+//        // Fetch resume data
         fetchResumeData()
     }
     
@@ -86,8 +84,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         view.addSubview(statusBarView)
         statusBarView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Use the same background color as the top bar
-        statusBarView.backgroundColor = .systemGray6
+        statusBarView.backgroundColor = .surfaceContainer
         
         NSLayoutConstraint.activate([
             statusBarView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -139,7 +136,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         activityIndicator.startAnimating()
         
         NSLayoutConstraint.activate([
-            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.topAnchor.constraint(equalTo: topBarView.bottomAnchor),
             loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -161,13 +158,11 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         topBarView.translatesAutoresizingMaskIntoConstraints = false
         menuButton.translatesAutoresizingMaskIntoConstraints = false
         
-        // Get from hex 1B2023
-        topBarView.backgroundColor = .systemGray6
+        topBarView.backgroundColor = .surfaceContainer
         
-        // Configure menu button
         let menuImage = UIImage(systemName: "line.horizontal.3")
         menuButton.setImage(menuImage, for: .normal)
-        menuButton.tintColor = .label
+        menuButton.tintColor = .onSurface
         menuButton.addTarget(self, action: #selector(menuButtonTapped), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
@@ -204,7 +199,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         
         // Get from hex 1B2023
-        menuOverlay.backgroundColor = .systemGray6
+        menuOverlay.backgroundColor = .surfaceContainer
         menuOverlay.alpha = 0
         menuOverlay.isHidden = true
         
@@ -218,17 +213,17 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         let topRowStack = UIStackView()
         topRowStack.axis = .horizontal
         topRowStack.spacing = 15
-        topRowStack.distribution = .fillEqually
+        topRowStack.distribution = .fill
         
         let middleRowStack = UIStackView()
         middleRowStack.axis = .horizontal
         middleRowStack.spacing = 15
-        middleRowStack.distribution = .fillEqually
+        middleRowStack.distribution = .fill
         
         let bottomRowStack = UIStackView()
         bottomRowStack.axis = .horizontal
         bottomRowStack.spacing = 15
-        bottomRowStack.distribution = .fillEqually
+        bottomRowStack.distribution = .fill
         
         topRowStack.addArrangedSubview(introButton)
         topRowStack.addArrangedSubview(codeButton)
@@ -237,6 +232,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         middleRowStack.addArrangedSubview(experienceButton)
         
         bottomRowStack.addArrangedSubview(languagesButton)
+        bottomRowStack.addArrangedSubview(contactButton)
         
         menuStackView.addArrangedSubview(topRowStack)
         menuStackView.addArrangedSubview(middleRowStack)
@@ -245,7 +241,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
         // Setup close button
         let xImage = UIImage(systemName: "xmark")
         closeButton.setImage(xImage, for: .normal)
-        closeButton.tintColor = .label
+        closeButton.tintColor = .onSurface
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         
         // Set up button actions
@@ -326,6 +322,7 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
             } catch {
                 DispatchQueue.main.async {
                     self.showError("Failed to parse data: \(error)")
+                    print(error)
                 }
             }
         }.resume()
@@ -479,10 +476,11 @@ class HomeScreen: UIViewController, UIScrollViewDelegate {
 
         personalDataSection.setData(
             name: resume.personalData.name,
-            shortDescription: resume.personalData.description,
+            title: resume.personalData.title,
+            description: resume.personalData.description,
             location: resume.personalData.location,
-            title: resume.introduction.title,
-            description: resume.introduction.description
+            introductionTitle: resume.introduction.title,
+            introductionDescription: resume.introduction.description
         )
         
         NSLayoutConstraint.activate([

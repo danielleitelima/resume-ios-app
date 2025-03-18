@@ -1,8 +1,10 @@
 import UIKit
+import BrandTheme
 
 class PersonalDataSection: UIView {
     private let nameLabel = UILabel()
-    private let shortDescriptionLabel = UILabel()
+    private let titleLabel = UILabel()
+    private let descriptionLabel = UILabel()
     private let locationIcon: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "mappin.and.ellipse"))
         imageView.contentMode = .scaleAspectFit
@@ -10,23 +12,24 @@ class PersonalDataSection: UIView {
     }()
     
     private let locationLabel = UILabel()
-    private let titleLabel = UILabel()
-    private let descriptionLabel = UILabel()
+    private let introductionTitleLabel = UILabel()
+    private let introductionDescriptionLabel = UILabel()
     
     @discardableResult
     func setData(
         name: String,
-        shortDescription: String,
-        location: String,
         title: String,
-        description: String
+        description: String,
+        location: String,
+        introductionTitle: String,
+        introductionDescription: String
     ) -> PersonalDataSection {
-       
         nameLabel.text = name
-        shortDescriptionLabel.text = shortDescription
-        locationLabel.text = location
         titleLabel.text = title
         descriptionLabel.text = description
+        locationLabel.text = location
+        introductionTitleLabel.text = introductionTitle
+        introductionDescriptionLabel.text = introductionDescription
         
         return self
     }
@@ -34,56 +37,65 @@ class PersonalDataSection: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .systemGray6
+        backgroundColor = .surfaceContainerLow
         layer.cornerRadius = 12
         
-        nameLabel.font = .systemFont(ofSize: 36, weight: .regular)
-        shortDescriptionLabel.font = .systemFont(ofSize: 16, weight: .regular)
-        locationLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        titleLabel.font = .systemFont(ofSize: 24, weight: .regular)
-        descriptionLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        nameLabel.font = .displaySmall(for: traitCollection)
+        titleLabel.font = .titleMedium(for: traitCollection)
+        descriptionLabel.font = .bodyLarge(for: traitCollection)
+        locationLabel.font = .labelMedium(for: traitCollection)
+        introductionTitleLabel.font = .headlineSmall(for: traitCollection)
+        introductionDescriptionLabel.font = .bodyMedium(for: traitCollection)
         
-        nameLabel.textColor = .label
-        shortDescriptionLabel.textColor = .label
-        locationIcon.tintColor = .label
-        locationLabel.textColor = .label
-        titleLabel.textColor = .label
-        descriptionLabel.textColor = .label
+        nameLabel.textColor = .onSurface
+        titleLabel.textColor = .onSurface
+        descriptionLabel.textColor = .onSurface
+        locationIcon.tintColor = .onSurface
+        locationLabel.textColor = .onSurface
+        introductionTitleLabel.textColor = .onSurface
+        introductionDescriptionLabel.textColor = .onSurface
         
         nameLabel.numberOfLines = 0
-        shortDescriptionLabel.numberOfLines = 0
-        locationLabel.numberOfLines = 0
         titleLabel.numberOfLines = 0
         descriptionLabel.numberOfLines = 0
+        locationLabel.numberOfLines = 0
+        introductionTitleLabel.numberOfLines = 0
+        introductionDescriptionLabel.numberOfLines = 0
         
         setConstraints()
     }
     
     private func setConstraints() {
         addSubview(nameLabel)
-        addSubview(shortDescriptionLabel)
-        addSubview(locationIcon)
-        addSubview(locationLabel)
         addSubview(titleLabel)
         addSubview(descriptionLabel)
+        addSubview(locationIcon)
+        addSubview(locationLabel)
+        addSubview(introductionTitleLabel)
+        addSubview(introductionDescriptionLabel)
 
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        shortDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        locationIcon.translatesAutoresizingMaskIntoConstraints = false
-        locationLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        locationIcon.translatesAutoresizingMaskIntoConstraints = false
+        locationLabel.translatesAutoresizingMaskIntoConstraints = false
+        introductionTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        introductionDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 24),
             nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
             nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
             
-            shortDescriptionLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 12),
-            shortDescriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            shortDescriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            titleLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 12),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
             
-            locationIcon.topAnchor.constraint(equalTo: shortDescriptionLabel.bottomAnchor, constant: 16),
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            
+            locationIcon.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 16),
             locationIcon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
             
             locationLabel.topAnchor.constraint(
@@ -95,15 +107,15 @@ class PersonalDataSection: UIView {
             locationLabel.leadingAnchor.constraint(equalTo: locationIcon.trailingAnchor, constant: 4),
             locationLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
             
-            titleLabel.topAnchor.constraint(equalTo: locationIcon.bottomAnchor, constant: 32),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            introductionTitleLabel.topAnchor.constraint(equalTo: locationIcon.bottomAnchor, constant: 32),
+            introductionTitleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            introductionTitleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
             
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            introductionDescriptionLabel.topAnchor.constraint(equalTo: introductionTitleLabel.bottomAnchor, constant: 8),
+            introductionDescriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            introductionDescriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
            
-            descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
+            introductionDescriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
         ])
     }
     

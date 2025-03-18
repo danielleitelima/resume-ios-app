@@ -3,11 +3,11 @@ import UIKit
 class ExperienceTimeline: UIView {
     private let contentStackView = UIStackView()
     let topBar = UIView()
-    let redBarContainer = UIView()
+    let topBarContainer = UIView()
     let yearBadge = UILabel()
     let badgeContainer = UIView()
     let middleBar = UIView()
-    let greenBarContainer = UIView()
+    let middleBarContainer = UIView()
     let divider = UIView()
     
     @discardableResult
@@ -17,7 +17,7 @@ class ExperienceTimeline: UIView {
         
         // Create vertical bar
         
-        topBar.backgroundColor = .systemGray4
+        topBar.backgroundColor = .primaryContainer
         topBar.translatesAutoresizingMaskIntoConstraints = false
         
         topBar.widthAnchor.constraint(equalToConstant: 16).isActive = true
@@ -29,51 +29,51 @@ class ExperienceTimeline: UIView {
         
         // Add vertical bar to a container to center it
         
-        redBarContainer.addSubview(topBar)
+        topBarContainer.addSubview(topBar)
         NSLayoutConstraint.activate([
-            topBar.centerXAnchor.constraint(equalTo: redBarContainer.centerXAnchor),
-            topBar.topAnchor.constraint(equalTo: redBarContainer.topAnchor),
-            topBar.bottomAnchor.constraint(equalTo: redBarContainer.bottomAnchor)
+            topBar.centerXAnchor.constraint(equalTo: topBarContainer.centerXAnchor),
+            topBar.topAnchor.constraint(equalTo: topBarContainer.topAnchor),
+            topBar.bottomAnchor.constraint(equalTo: topBarContainer.bottomAnchor)
         ])
         
         // Year badge
         
         yearBadge.text = year
+        yearBadge.font = .labelSmall
         yearBadge.textAlignment = .center
-        yearBadge.textColor = .label
-        yearBadge.backgroundColor = .systemGray6
+        yearBadge.textColor = .onPrimary
+        yearBadge.backgroundColor = .primary
         yearBadge.layer.cornerRadius = 8
         yearBadge.clipsToBounds = true
         yearBadge.translatesAutoresizingMaskIntoConstraints = false
-        
         
         badgeContainer.addSubview(yearBadge)
         NSLayoutConstraint.activate([
             yearBadge.centerXAnchor.constraint(equalTo: badgeContainer.centerXAnchor),
             yearBadge.centerYAnchor.constraint(equalTo: badgeContainer.centerYAnchor),
-            yearBadge.widthAnchor.constraint(equalToConstant: 60),
+            yearBadge.leadingAnchor.constraint(equalTo: badgeContainer.leadingAnchor),
+            yearBadge.trailingAnchor.constraint(equalTo: badgeContainer.trailingAnchor),
             yearBadge.heightAnchor.constraint(equalToConstant: 32),
             badgeContainer.heightAnchor.constraint(equalToConstant: 30)
         ])
         
         // Bar above the year badge (48pt height)
         
-        middleBar.backgroundColor = .systemGray4
+        middleBar.backgroundColor = .primaryContainer
         middleBar.translatesAutoresizingMaskIntoConstraints = false
         
-        
-        greenBarContainer.addSubview(middleBar)
+        middleBarContainer.addSubview(middleBar)
         NSLayoutConstraint.activate([
-            middleBar.centerXAnchor.constraint(equalTo: greenBarContainer.centerXAnchor),
-            middleBar.topAnchor.constraint(equalTo: greenBarContainer.topAnchor),
-            middleBar.bottomAnchor.constraint(equalTo: greenBarContainer.bottomAnchor),
+            middleBar.centerXAnchor.constraint(equalTo: middleBarContainer.centerXAnchor),
+            middleBar.topAnchor.constraint(equalTo: middleBarContainer.topAnchor),
+            middleBar.bottomAnchor.constraint(equalTo: middleBarContainer.bottomAnchor),
             middleBar.widthAnchor.constraint(equalToConstant: 16),
-            greenBarContainer.heightAnchor.constraint(equalToConstant: 24)
+            middleBarContainer.heightAnchor.constraint(equalToConstant: 24)
         ])
         
         // Divider (3pt height)
         
-        divider.backgroundColor = .systemGray
+        divider.backgroundColor = .primary
         divider.translatesAutoresizingMaskIntoConstraints = false
         
         let dividerContainer = UIView()
@@ -82,35 +82,35 @@ class ExperienceTimeline: UIView {
             divider.heightAnchor.constraint(equalToConstant: 3),
             divider.topAnchor.constraint(equalTo: dividerContainer.topAnchor),
             divider.bottomAnchor.constraint(equalTo: dividerContainer.bottomAnchor),
-            divider.leadingAnchor.constraint(equalTo: dividerContainer.leadingAnchor, constant: 8),
-            divider.trailingAnchor.constraint(equalTo: dividerContainer.trailingAnchor, constant: -8)
+            divider.leadingAnchor.constraint(equalTo: dividerContainer.leadingAnchor),
+            divider.trailingAnchor.constraint(equalTo: dividerContainer.trailingAnchor)
         ])
                 
-        contentStackView.addArrangedSubview(redBarContainer)
+        contentStackView.addArrangedSubview(topBarContainer)
         contentStackView.addArrangedSubview(dividerContainer)
-        contentStackView.addArrangedSubview(greenBarContainer)
+        contentStackView.addArrangedSubview(middleBarContainer)
         contentStackView.addArrangedSubview(badgeContainer)
         
         // Add elements to stack view from bottom to top (since it's a vertical stack)
         if isLast {
             // Bottom bar with rounded corners for the last item
             let bottomBar = UIView()
-            bottomBar.backgroundColor = .systemGray4
+            bottomBar.backgroundColor = .primaryContainer
             bottomBar.translatesAutoresizingMaskIntoConstraints = false
             bottomBar.layer.cornerRadius = 8
             bottomBar.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
             
-            let blueBarContainer = UIView()
-            blueBarContainer.addSubview(bottomBar)
+            let bottomBarContainer = UIView()
+            bottomBarContainer.addSubview(bottomBar)
             NSLayoutConstraint.activate([
-                bottomBar.centerXAnchor.constraint(equalTo: blueBarContainer.centerXAnchor),
-                bottomBar.topAnchor.constraint(equalTo: blueBarContainer.topAnchor),
-                bottomBar.bottomAnchor.constraint(equalTo: blueBarContainer.bottomAnchor),
+                bottomBar.centerXAnchor.constraint(equalTo: bottomBarContainer.centerXAnchor),
+                bottomBar.topAnchor.constraint(equalTo: bottomBarContainer.topAnchor),
+                bottomBar.bottomAnchor.constraint(equalTo: bottomBarContainer.bottomAnchor),
                 bottomBar.widthAnchor.constraint(equalToConstant: 16),
-                blueBarContainer.heightAnchor.constraint(equalToConstant: 48)
+                bottomBarContainer.heightAnchor.constraint(equalToConstant: 48)
             ])
             
-            contentStackView.addArrangedSubview(blueBarContainer)
+            contentStackView.addArrangedSubview(bottomBarContainer)
         }
     
         return self
@@ -123,7 +123,6 @@ class ExperienceTimeline: UIView {
         contentStackView.alignment = .fill
         contentStackView.spacing = 6
         contentStackView.distribution = .fill
-        
         
         setupConstraints()
     }
